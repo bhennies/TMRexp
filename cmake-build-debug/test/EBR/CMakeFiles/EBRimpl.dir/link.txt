@@ -1,0 +1,1 @@
+/usr/bin/c++ -std=c++17 -O3 -DNDEBUG -rdynamic CMakeFiles/EBRimpl.dir/Stack.cpp.o -o ../../bin/EBRimpl  ../../src/libTMRexpLib.a 
