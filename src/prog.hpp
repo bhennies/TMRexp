@@ -223,7 +223,7 @@ namespace tmr {
 		public:
 			enum Class {
 				SQZ, ASSIGN, MALLOC, ITE, WHILE, BREAK, WRITEREC, CAS, SETNULL, ATOMIC, KILL, SETADD_ARG,
-				SETADD_SEL, SETCOMBINE, SETCLEAR, FREEALL, INITREC, SETEPOCH, GETEPOCH, INC
+				SETADD_SEL, SETCOMBINE, SETCLEAR, FREEALL, INITREC, SETEPOCH, GETEPOCH, INC, SETREADCRITICAL
 			};
 			virtual ~Statement() = default;
 			virtual Class clazz() const = 0;
@@ -552,6 +552,17 @@ namespace tmr {
 			void checkRecInit(std::set<const Variable*>& fromAllocation) const;
 	};
 
+    class SetReadCritical : public Statement {
+        private:
+            bool _setTo;
+        public:
+            SetReadCritical(bool setTo) : _setTo(setTo) {}
+            Statement::Class clazz() const { return Statement::Class::SETREADCRITICAL; }
+            void namecheck(const std::map<std::string, Variable*>& name2decl);
+            void print(std::ostream& os, std::size_t indent) const;
+            void checkRecInit(std::set<const Variable*>& fromAllocation) const;
+    };
+
 	/*********************** PROGRAM ***********************/
 
 	class Function {
@@ -653,6 +664,8 @@ namespace tmr {
 	std::unique_ptr<SetCombine> SetAssign(std::size_t lhs, std::size_t rhs);
 	std::unique_ptr<SetCombine> SetMinus(std::size_t lhs, std::size_t rhs);
 	std::unique_ptr<SetClear> Clear(std::size_t lhs);
+
+    std::unique_ptr<SetReadCritical> SetRC(bool setTo);
 
 	std::unique_ptr<CompareAndSwap> CAS(std::unique_ptr<Expr> dst, std::unique_ptr<Expr> cmp, std::unique_ptr<Expr> src);
 

@@ -298,6 +298,9 @@ std::unique_ptr<SetClear> tmr::Clear(std::size_t lhs) {
 	return std::make_unique<SetClear>(lhs);
 }
 
+std::unique_ptr<SetReadCritical> tmr::SetRC(bool setTo) {
+    return std::make_unique<SetReadCritical>(setTo);
+}
 
 std::unique_ptr<Function> tmr::Fun(std::string name, std::unique_ptr<Sequence> body, bool has_arg) {
 	std::unique_ptr<Function> res(new Function(name, std::move(body), has_arg));
@@ -483,6 +486,9 @@ void SetAddSel::namecheck(const std::map<std::string, Variable*>& name2decl) {
 	_sel->namecheck(name2decl);
 }
 
+void SetReadCritical::namecheck(const std::map<std::string, Variable *> &name2decl) {
+}
+
 void Function::namecheck(const std::map<std::string, Variable*>& name2decl) {
 	_stmts->namecheck(name2decl);
 }
@@ -608,6 +614,9 @@ void SetClear::checkRecInit(std::set<const Variable*>& fromAllocation) const {
 }
 
 void FreeAll::checkRecInit(std::set<const Variable*>& fromAllocation) const {
+}
+
+void SetReadCritical::checkRecInit(std::set<const Variable*>& fromAllocation) const {
 }
 
 void Function::checkRecInit() const {
@@ -961,6 +970,11 @@ void FreeAll::print(std::ostream& os, std::size_t indent) const {
 	std::cout << ");";
 }
 
+void SetReadCritical::print(std::ostream &os, std::size_t indent) const {
+    printID;
+    os << "inReadCritical = " << _setTo << ";";
+}
+
 std::ostream& tmr::operator<<(std::ostream& os, const Function& fun) {
 	fun.print(os);
 	return os;
@@ -1043,6 +1057,8 @@ void Program::print(std::ostream& os) const {
 	os << "time_t epoch;" << std::endl;
 	INDENT(2);
 	os << "Set<data_t> set0, set1, set2;" << std::endl;
+    INDENT(2);
+    os << "bool inReadCritical;" << std::endl;
 	// free_all macro
 	os << std::endl;
 	printNodeStruct(os);

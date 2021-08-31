@@ -20,7 +20,7 @@ static std::unique_ptr<Program> mk_program() {
 
 	// leaveQ
 	auto fun2 = Sqz(
-
+            SetRC(true)
 	);
 
 	// retire

@@ -35,6 +35,7 @@ static std::vector<Cfg> get_post_cfgs(const Cfg& cfg, unsigned short tid) {
 		case Statement::SETCOMBINE: return tmr::post(cfg, static_cast<const            SetCombine&>(stmt), tid);
 		case Statement::SETCLEAR:   return tmr::post(cfg, static_cast<const              SetClear&>(stmt), tid);
 		case Statement::FREEALL:    return tmr::post(cfg, static_cast<const               FreeAll&>(stmt), tid);
+        case Statement::SETREADCRITICAL: return tmr::post(cfg, static_cast<const  SetReadCritical&>(stmt), tid);
 	}
 	assert(false);
 }
