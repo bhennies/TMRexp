@@ -52,7 +52,3 @@ std::vector<Cfg> tmr::post(const Cfg& cfg, const Killer& stmt, unsigned short ti
 	return result;
 }
 
-std::vector<Cfg> tmr::post(const Cfg& cfg, const SetReadCritical& stmt, unsigned short tid) {
-    CHECK_STMT;
-    return noop(cfg, tid);
-}

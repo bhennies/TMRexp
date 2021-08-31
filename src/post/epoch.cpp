@@ -64,6 +64,7 @@ std::vector<Cfg> tmr::eval_epoch_sel(const Cfg& cfg, const EpochSelCondition& co
 	return result;
 }
 
+
 std::vector<Cfg> tmr::post(const Cfg& cfg, const IncrementGlobalEpoch& stmt, unsigned short tid) {
 	CHECK_STMT;
 	auto result = mk_next_config_vec(cfg, new Shape(*cfg.shape), tid);

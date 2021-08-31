@@ -187,6 +187,10 @@ std::unique_ptr<EpochSelCondition> tmr::EpochCond(std::string name) {
 	return res;
 }
 
+std::unique_ptr<ReadCriticalVarCondition> tmr::RCCond() {
+    return std::make_unique<ReadCriticalVarCondition>();
+}
+
 
 
 std::unique_ptr<Assignment> tmr::Assign (std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs) {
@@ -330,6 +334,8 @@ void EpochVarCondition::propagateFun(const Function* fun) {}
 
 void EpochSelCondition::propagateFun(const Function* fun) {}
 
+void ReadCriticalVarCondition::propagateFun(const Function *fun) {}
+
 void Sequence::propagateFun(const Function* fun) {
 	Statement::propagateFun(fun);
 	for (const auto& s : _stmts) s->propagateFun(fun);
@@ -408,6 +414,8 @@ void EpochVarCondition::namecheck(const std::map<std::string, Variable*>& name2d
 void EpochSelCondition::namecheck(const std::map<std::string, Variable*>& name2decl) {
 	_cmp->namecheck(name2decl);
 }
+
+void ReadCriticalVarCondition::namecheck(const std::map<std::string, Variable *> &name2decl) {}
 
 void Sequence::namecheck(const std::map<std::string, Variable*>& name2decl) {
 	for (const auto& stmt : _stmts) stmt->namecheck(name2decl);
@@ -819,6 +827,10 @@ void EpochVarCondition::print(std::ostream& os) const {
 
 void EpochSelCondition::print(std::ostream& os) const {
 	os << "epoch != " << *_cmp << "->epoch";
+}
+
+void ReadCriticalVarCondition::print(std::ostream &os) const {
+    os << "inReadCritical";
 }
 
 std::ostream& tmr::operator<<(std::ostream& os, const Statement& stmt) {

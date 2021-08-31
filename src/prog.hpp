@@ -119,7 +119,7 @@ namespace tmr {
 	class Condition {
 		public:
 			virtual ~Condition() = default;
-			enum Type { EQNEQ, CASC, TRUEC, COMPOUND, ORACLEC, NONDET, EPOCH_VAR, EPOCH_SEL };
+			enum Type { EQNEQ, CASC, TRUEC, COMPOUND, ORACLEC, NONDET, EPOCH_VAR, EPOCH_SEL, RC_VAR };
 			virtual Type type() const = 0;
 			virtual void namecheck(const std::map<std::string, Variable*>& name2decl) = 0;
 			virtual void print(std::ostream& os) const = 0;
@@ -208,6 +208,14 @@ namespace tmr {
 			void propagateFun(const Function* fun);
 			const VarExpr& var() const { return *_cmp; }
 	};
+
+    class ReadCriticalVarCondition: public Condition {
+        public:
+            void namecheck(const std::map<std::string, Variable*>& name2decl);
+            void print(std::ostream& os) const;
+            Type type() const { return Type::RC_VAR; }
+            void propagateFun(const Function* fun);
+    };
 
 
 	/*********************** STATEMENT ***********************/
@@ -558,6 +566,7 @@ namespace tmr {
         public:
             SetReadCritical(bool setTo) : _setTo(setTo) {}
             Statement::Class clazz() const { return Statement::Class::SETREADCRITICAL; }
+            bool setTo() const { return _setTo;}
             void namecheck(const std::map<std::string, Variable*>& name2decl);
             void print(std::ostream& os, std::size_t indent) const;
             void checkRecInit(std::set<const Variable*>& fromAllocation) const;
@@ -639,6 +648,7 @@ namespace tmr {
 	std::unique_ptr<NonDetCondition> NDCond();
 	std::unique_ptr<EpochVarCondition> EpochCond();
 	std::unique_ptr<EpochSelCondition> EpochCond(std::string name);
+    std::unique_ptr<ReadCriticalVarCondition> RCCond();
 
 	std::unique_ptr<Assignment> Assign (std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs);
 	std::unique_ptr<NullAssignment> SetNull (std::unique_ptr<Expr> lhs);

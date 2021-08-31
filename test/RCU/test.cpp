@@ -13,14 +13,18 @@ static std::unique_ptr<Program> mk_program() {
 	);
 
 	// enterQ
-	auto fun1 = Sqz(
-            Free(0),
-            Clear(0)
+	auto fun1 = Sqz(SetRC(true),
+                    IfThenElse(RCCond(),
+                               Sqz(),
+                               Sqz(
+                                       Free(0),
+                                       Clear(0)))
+
+
 	);
 
 	// leaveQ
 	auto fun2 = Sqz(
-            SetRC(true)
 	);
 
 	// retire

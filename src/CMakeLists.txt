@@ -17,6 +17,7 @@ set(SOURCES
 	post/eval_eqneq.cpp
 	post/inout.cpp
 	post/mem.cpp
+	post/bools.cpp
 	fixpoint.cpp
 )
 add_library(TMRexpLib ${SOURCES})
