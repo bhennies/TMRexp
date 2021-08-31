@@ -23,6 +23,7 @@ std::ostream& tmr::operator<<(std::ostream& os, const Cfg& cfg) {
 	os << ", datasel0=" << cfg.datasel0;
 	os << ", datasel1=" << cfg.datasel1;
 	os << ", epochsel=" << cfg.epochsel;
+    os << ", inReadCritical=[" << cfg.inReadCritical[0] << ", " << cfg.inReadCritical[1] << "]";
 	os << ", localepoch=[" << cfg.localepoch[0] << ", " << cfg.localepoch[1] << "]";
 	os << ", dataset0=[" << cfg.dataset0[0] << ", " << cfg.dataset0[1] << "]";
 	os << ", dataset1=[" << cfg.dataset1[0] << ", " << cfg.dataset1[1] << "]";

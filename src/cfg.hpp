@@ -66,6 +66,7 @@ namespace tmr {
 		DataValue datasel1; // data1 selectors for special pointer
 		Epoch globalepoch;
 		Epoch epochsel;
+        MultiBool inReadCritical;
 		MultiEpoch localepoch;
 		MultiSet dataset0;
 		MultiSet dataset1;
@@ -76,12 +77,12 @@ namespace tmr {
 		    : pc(pc), smrstate(smrstate), threadstate(threadstate), arg(DEFAULT_DATA_VALUE), offender(false), shape(shape),
 		      datasel0(DEFAULT_DATA_VALUE), datasel1(DEFAULT_DATA_VALUE), globalepoch(DEFAULT_EPOCH), epochsel(DEFAULT_EPOCH),
 		      localepoch(DEFAULT_EPOCH), dataset0(DEFAULT_DATA_SET), dataset1(DEFAULT_DATA_SET), dataset2(DEFAULT_DATA_SET),
-		      owned(false)
+		      owned(false), inReadCritical(false)
 		{}
 		Cfg(const Cfg& cfg, Shape* shape)
 		    : pc(cfg.pc), smrstate(cfg.smrstate), threadstate(cfg.threadstate), arg(cfg.arg), offender(cfg.offender), shape(shape),
 		      datasel0(cfg.datasel0), datasel1(cfg.datasel1), globalepoch(cfg.globalepoch), epochsel(cfg.epochsel), localepoch(cfg.localepoch),
-		      dataset0(cfg.dataset0), dataset1(cfg.dataset1), dataset2(cfg.dataset2), owned(cfg.owned)
+		      dataset0(cfg.dataset0), dataset1(cfg.dataset1), dataset2(cfg.dataset2), owned(cfg.owned), inReadCritical(cfg.inReadCritical)
 		{}
 		Cfg copy() const;
 	};
