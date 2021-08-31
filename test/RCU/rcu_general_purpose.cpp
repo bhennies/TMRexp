@@ -8,20 +8,31 @@ using namespace tmr;
 
 static std::unique_ptr<Program> mk_program() {
 
-    std::string name = "RCUimpl";
+    std::string name = "RCUimpl_general";
 
     // init prog
     auto init = Sqz(
-            SetNull(Var("readSet")),
-            SetNull(Var("boundingSet"))
+            SetNull(Var("RCUrecs"))
             );
 
     // init thread
     auto initthread = Sqz(
             Mllc("cur"),
-            InitRec("cur"),
-            Kill("cur")
-            );
+            Loop(Sqz(
+                    Assign(Var("tmp"), Var("RCUrecs")),
+                    Assign(Next("cur"), Var("tmp")),
+                    IfThen(
+                            CasCond(CAS(Var("RCUrecs"), Var("tmp"), Var("cur"))),
+                            Sqz(Brk())
+                            ),
+                            Kill("tmp")
+                            )),
+                            InitRec("cur"),
+                            GetEpoch(),
+                            SetEpoch(),
+                            Kill("cur"),
+                            Kill("tmp")
+                            );
 
     auto readBegin = Sqz(AtomicSqz(
             Assign(Next("readSet"), Var("__rec__")),
@@ -41,7 +52,7 @@ static std::unique_ptr<Program> mk_program() {
 
     auto prog = Prog(
             name,
-            {"readSet", "boundingSet", "lock"},
+            {"RCUrecs", "lock"},
             {"cur"},
             std::move(init),
             std::move(initthread),

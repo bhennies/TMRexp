@@ -80,4 +80,22 @@ namespace tmr {
 		return run(program, *smrobs, *threadobs, expect_success);
 	}
 
+	int run_rcu_with_inv(const Program& program, bool expect_succes=true) {
+	    auto smrobs = rcu_observer(program);
+	    auto threadobs = base_observer_with_EBR_assumption(program);
+        return run(program, *smrobs, *threadobs, expect_succes);
+	}
+
+	int run_rcu(const Program& program, bool expect_succes=true) {
+	    auto smrobs = rcu_observer(program);
+	    auto threadobs = base_observer(program);
+	    return run(program, *smrobs, *threadobs, expect_succes);
+	}
+
+    int run_test(const Program& program, bool expect_succes=true) {
+        auto smrobs = test_observer(program);
+        auto threadobs = base_observer(program);
+        return run(program, *smrobs, *threadobs, expect_succes);
+    }
+
 }
