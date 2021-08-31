@@ -1,1 +1,0 @@
-/usr/bin/c++ -std=c++17 -O3 -DNDEBUG -rdynamic CMakeFiles/HPimpl.dir/Stack.cpp.o -o ../../bin/HPimpl  ../../src/libTMRexpLib.a 
