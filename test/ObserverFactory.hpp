@@ -328,4 +328,109 @@ namespace tmr {
 		return std::make_unique<Observer>(std::move(states));
 	}
 
+	static std::unique_ptr<Observer> rcu_observer(const Program& prog) {
+	    // get functions to react on
+	    const auto& f_leaveQ = find(prog, "readBegin");
+	    const auto& f_enterQ = find(prog, "readEnd");
+	    //const auto& f_writeBegin = find(prog, "writeBegin");
+	    //const auto& f_writeEnd = find(prog, "writeEnd");
+	    const auto& f_retire = find(prog, "retire");
+
+	    // state names
+	    std::string n_init        = "ebr:init";
+	    std::string n_leavingQ    = "ebr:leavingQ";
+	    std::string n_leftQ       = "ebr:leftQ";
+	    std::string n_leftretired = "ebr:retired";
+	    std::string n_final       = "ebr:freedprotected";
+	    std::string n_inQ         = "inv:inQ";
+	    std::string n_outQ        = "inv:outQ";
+	    std::string n_sink        = "inv:sink";
+
+	    // state vector
+	    std::vector<std::unique_ptr<State>> states;
+
+	    // ebr observer states
+	    states.push_back(mk_state_init(n_init));
+	    states.push_back(mk_state(n_leavingQ));
+	    states.push_back(mk_state(n_leftQ));
+	    states.push_back(mk_state(n_leftretired));
+	    states.push_back(mk_state_final(n_final));
+
+	    // invariant observer states
+	    states.push_back(mk_state_init(n_inQ));
+	    states.push_back(mk_state(n_outQ));
+	    states.push_back(mk_state_marked(n_sink));
+
+	    // get hold of the stats
+	    State& init        = *states[0];
+	    State& leavingQ    = *states[1];
+	    State& leftQ       = *states[2];
+	    State& leftretired = *states[3];
+	    State& final       = *states[4];
+	    State& inQ         = *states[5];
+	    State& outQ        = *states[6];
+	    State& sink        = *states[7];
+
+	    // shortcuts
+	    auto ADR = DataValue::DATA;
+	    auto OTHER = DataValue::OTHER;
+
+	    // ebr observer transitions
+	    mk_transition(init, leavingQ, Event::mk_enter(f_leaveQ, true, ADR));
+	    mk_transition(init, leavingQ, Event::mk_enter(f_leaveQ, true, OTHER));
+	    mk_transition(leavingQ, leftQ, Event::mk_exit(true));
+	    mk_transition(leftQ, leftretired, Event::mk_enter(f_retire, true, ADR));
+	    mk_transition(leftQ, leftretired, Event::mk_enter(f_retire, false, ADR));
+	    mk_transition(leftretired, final, Event::mk_free(true, ADR));
+	    mk_transition(leftretired, final, Event::mk_free(false, ADR));
+	    mk_transition(leavingQ, init, Event::mk_enter(f_enterQ, true, ADR));
+	    mk_transition(leavingQ, init, Event::mk_enter(f_enterQ, true, OTHER));
+	    mk_transition(leftQ, init, Event::mk_enter(f_enterQ, true, ADR));
+	    mk_transition(leftQ, init, Event::mk_enter(f_enterQ, true, OTHER));
+	    mk_transition(leftretired, init, Event::mk_enter(f_enterQ, true, ADR));
+	    mk_transition(leftretired, init, Event::mk_enter(f_enterQ, true, OTHER));
+
+	    // ebr observer transitions
+	    mk_transition(inQ, outQ, Event::mk_enter(f_leaveQ, true, ADR));
+	    mk_transition(inQ, outQ, Event::mk_enter(f_leaveQ, true, OTHER));
+	    mk_transition(outQ, inQ, Event::mk_enter(f_enterQ, true, ADR));
+	    mk_transition(outQ, inQ, Event::mk_enter(f_enterQ, true, OTHER));
+	    mk_transition(outQ, sink, Event::mk_enter(f_leaveQ, true, ADR));
+	    mk_transition(outQ, sink, Event::mk_enter(f_leaveQ, true, OTHER));
+
+	    // done
+	    return std::make_unique<Observer>(std::move(states));
+	}
+
+    static std::unique_ptr<Observer> test_observer(const Program& prog) {
+        const auto& fun1 = find(prog, "fun1");
+        const auto& fun2 = find(prog, "fun2");
+
+        std::vector<std::unique_ptr<State>> states;
+
+        states.push_back(mk_state_init("test:init"));
+        states.push_back(mk_state("test:middle"));
+        states.push_back(mk_state_final("test:final"));
+
+        State& init        = *states[0];
+        State& middle      = *states[1];
+        State& final       = *states[2];
+
+        auto ADR = DataValue::DATA;
+        auto OTHER = DataValue::OTHER;
+
+        mk_transition(init, middle, Event::mk_enter(fun1, true, ADR));
+        mk_transition(init, middle, Event::mk_enter(fun1, true, OTHER));
+
+        mk_transition(middle, init, Event::mk_enter(fun2, true, ADR));
+        mk_transition(middle, init, Event::mk_enter(fun2, true, OTHER));
+
+        mk_transition(middle, final, Event::mk_free(true, ADR));
+        mk_transition(middle, final, Event::mk_free(true, OTHER));
+
+
+        return std::make_unique<Observer>(std::move(states));
+
+    }
 }
+

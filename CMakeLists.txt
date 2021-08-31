@@ -6,9 +6,9 @@ project(TMRexp CXX)
 set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 # don't get rid of assertions
-# set(CMAKE_BUILD_TYPE Debug)
+ set(CMAKE_BUILD_TYPE Debug)
 # set(CMAKE_BUILD_TYPE RelWithDebInfo)
-set(CMAKE_BUILD_TYPE Release)
+# set(CMAKE_BUILD_TYPE Release)
 
 # use c++11
 if(CMAKE_COMPILER_IS_GNUCXX)
