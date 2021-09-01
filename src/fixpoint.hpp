@@ -22,7 +22,8 @@ namespace tmr {
 			const Cfg& pop();
 			void add(Cfg&& cfg);
 			void add(std::vector<Cfg>&& cfgs) {
-				for (Cfg& c : cfgs) add(std::move(c));
+				for (Cfg& c : cfgs)
+                    add(std::move(c));
 			}
 	};
 

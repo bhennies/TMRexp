@@ -86,7 +86,9 @@ std::unique_ptr<Encoding> tmr::fixed_point(const Program& prog, const Observer& 
 			// std::cout << std::endl << std::endl << "==============================================================" << std::endl << "posting: " << topost; // DEBUG OUTPUT
 			// if (topost.pc[0] && topost.pc[0]->id() == 32) std::cout << *topost.shape << std::endl; // DEBUG OUTPUT
 			// std::cout << std::endl; // DEBUG OUTPUT
-			work.add(tmr::mk_all_post(topost, prog));
+            auto postcfgs = tmr::mk_all_post(topost, prog);
+            work.add(std::move(postcfgs));
+
 
 			SEQUENTIAL_STEPS++;
 			counter++;

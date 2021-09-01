@@ -6,6 +6,7 @@ using namespace tmr;
 static std::unique_ptr<Program> mk_program() {
 	// init prog
 	auto init = Sqz(
+            SetNull(Var("RCUrecs"))
 	);
 
 	// init thread
@@ -39,7 +40,8 @@ static std::unique_ptr<Program> mk_program() {
 	// retire
 	auto retire = Sqz(
             AddArg(0),
-            IfThenElse(RCCond(),
+            Assign(Var("cur"), Var("RCUrecs")),
+            IfThenElse(RCCond("cur"),
                        Sqz(),
                        Sqz(Free(0),
                        Clear(0)))

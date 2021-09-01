@@ -9,25 +9,26 @@ using namespace tmr;
 /******************************** SHAPE ASSERTIONS ********************************/
 
 bool check_special_relations_constraints(const Shape& shape) {
+    bool result = true;
 	auto null = shape.index_NULL();
 	auto rec = shape.index_REC();
 	auto undef = shape.index_UNDEF();
 	// ensure that null and undef are unrelated
-	if (shape.at(null, undef).count() != 1 || !shape.at(null, undef).test(BT)) return false;
-	// ensure that null and rec are unrelated
-	if (shape.at(null, rec).count() != 1 || !shape.at(null, rec).test(BT)) return false;
+	if (shape.at(null, undef).count() != 1 || !shape.at(null, undef).test(BT)) result = false;
+	// ensure that null and rec are unrelated (Should this be really the case? rec->next could be null)
+	if (shape.at(null, rec).count() != 1 || !shape.at(null, rec).test(BT)) result = false;
 	// ensure that undef and rec are unrelated
-	if (shape.at(undef, rec).count() != 1 || !shape.at(undef, rec).test(BT)) return false;
+	if (shape.at(undef, rec).count() != 1 || !shape.at(undef, rec).test(BT)) result = false;
 	for (std::size_t i = shape.offset_vars(); i < shape.size(); i++) {
 		// cell term i may only relate with =, ↦, ⇢ or ⋈ to NULL
-		if (shape.at(i, null).test(MF)) return false;
-		if (shape.at(i, null).test(GF)) return false;
+		if (shape.at(i, null).test(MF)) result = false;
+		if (shape.at(i, null).test(GF)) result = false;
 		// cell term i may only relate with ↦, ⇢ or ⋈ to UNDEFINED
-		if (shape.at(i, undef).test(EQ)) return false;
-		if (shape.at(i, undef).test(MF)) return false;
-		if (shape.at(i, undef).test(GF)) return false;
+		if (shape.at(i, undef).test(EQ)) result = false;
+		if (shape.at(i, undef).test(MF)) result = false;
+		if (shape.at(i, undef).test(GF)) result = false;
 	}
-	return true;
+	return result;
 }
 
 
@@ -107,7 +108,7 @@ bool tmr::consistent(const Shape& shape, std::size_t x, std::size_t z, Rel rel) 
 }
 
 bool tmr::consistent(const Shape& shape) {
-	//assert(check_special_relations_constraints(shape)); this check fails
+	/*assert(*/check_special_relations_constraints(shape)/*)*/; //this check fails
 	for (std::size_t x = 0; x < shape.size(); x++)
 		if (shape.at(x, x) != EQ_)
 			return false;
