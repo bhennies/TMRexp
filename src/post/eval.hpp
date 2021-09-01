@@ -38,7 +38,10 @@ namespace tmr {
 
     std::vector<Cfg> eval_rc_var(const Cfg& cfg, const ReadCriticalVarCondition& cond, const Statement* nY, const Statement* nN, unsigned short tid);
 
-	static std::vector<Cfg> eval_cond(const Cfg& cfg, const Conditional& stmt, unsigned short tid) {
+    std::vector<Cfg> eval_rc_sel(const Cfg& cfg, const ReadCriticalSelCondition& cond, const Statement* nY, const Statement* nN, unsigned short tid);
+
+
+    static std::vector<Cfg> eval_cond(const Cfg& cfg, const Conditional& stmt, unsigned short tid) {
 		const Statement* nextY = stmt.next_true_branch();
 		const Statement* nextN = stmt.next_false_branch();
 		switch (stmt.cond().type()) {
@@ -50,6 +53,7 @@ namespace tmr {
 			case Condition::EPOCH_VAR: return eval_epoch_var(cfg, static_cast<const EpochVarCondition&>(stmt.cond()), nextY, nextN, tid);
 			case Condition::EPOCH_SEL: return eval_epoch_sel(cfg, static_cast<const EpochSelCondition&>(stmt.cond()), nextY, nextN, tid);
             case Condition::RC_VAR: return eval_rc_var(cfg, static_cast<const ReadCriticalVarCondition&>(stmt.cond()), nextY, nextN, tid);
+            case Condition::RC_SEL: return eval_rc_sel(cfg, static_cast<const ReadCriticalSelCondition&>(stmt.cond()), nextY, nextN, tid);
 			case Condition::TRUEC:
 				std::vector<Cfg> result;
 				result.push_back(mk_next_config(cfg, new Shape(*cfg.shape), nextY, tid));

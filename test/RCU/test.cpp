@@ -10,35 +10,67 @@ static std::unique_ptr<Program> mk_program() {
 
 	// init thread
 	auto initthread = Sqz(
+            Mllc("cur"),
+            Loop(Sqz(
+                    Assign(Var("tmp"), Var("RCUrecs")),
+                    Assign(Next("cur"), Var("tmp")),
+                    IfThen(
+                            CasCond(CAS(Var("RCUrecs"), Var("tmp"), Var("cur"))),
+                            Sqz(Brk())
+                    ),
+                    Kill("tmp")
+            )),
+            InitRec("cur"),
+            SetRC(false),
+            Kill("cur"),
+            Kill("tmp")
 	);
 
 	// enterQ
-	auto fun1 = Sqz(SetRC(true),
-                    IfThenElse(RCCond(),
-                               Sqz(),
-                               Sqz(
-                                       Free(0),
-                                       Clear(0)))
+	auto fun1 = Sqz(SetRC(true)
 
 
 	);
 
 	// leaveQ
-	auto fun2 = Sqz(
+	auto fun2 = Sqz(SetRC(false)
 	);
 
 	// retire
 	auto retire = Sqz(
-            AddArg(0)
-	);
+            AddArg(0),
+            Assign(Var("cur"), Var("RCUrecs")),
+            Loop(Sqz(
+                    IfThenElse(
+                            EqCond(Var("cur"), Null()),
+                            Sqz(
+                                    AtomicSqz(
+                                            Free(0),
+                                            Clear(0)
+                                    ),
+                                    Brk()
+                            ),
+                            Sqz(
+                                    IfThenElse(
+                                            RCCond("cur"),
+                                            Sqz(Brk()),
+                                            Sqz()
+                                    ),
+                                    Assign(Var("tmp"), Next("cur")),
+                                    Assign(Var("cur"), Var("tmp")),
+                                    Kill("tmp")
+                            )
+                    )
+
+	)));
 
 
 	std::string name = "TESTimpl";
 
 	auto prog = Prog(
 		name,
-		{},
-		{},
+		{"RCUrecs"},
+		{"cur", "tmp"},
 		std::move(init),
 		std::move(initthread),
 		Fun("fun1", std::move(fun1), false),
