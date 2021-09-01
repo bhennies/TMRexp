@@ -39,30 +39,13 @@ static std::unique_ptr<Program> mk_program() {
 	// retire
 	auto retire = Sqz(
             AddArg(0),
-            Assign(Var("cur"), Var("RCUrecs")),
-            Loop(Sqz(
-                    IfThenElse(
-                            EqCond(Var("cur"), Null()),
-                            Sqz(
-                                    AtomicSqz(
-                                            Free(0),
-                                            Clear(0)
-                                    ),
-                                    Brk()
-                            ),
-                            Sqz(
-                                    IfThenElse(
-                                            RCCond("cur"),
-                                            Sqz(Brk()),
-                                            Sqz()
-                                    ),
-                                    Assign(Var("tmp"), Next("cur")),
-                                    Assign(Var("cur"), Var("tmp")),
-                                    Kill("tmp")
-                            )
-                    )
+            IfThenElse(RCCond(),
+                       Sqz(),
+                       Sqz(Free(0),
+                       Clear(0)))
 
-	)));
+
+	);
 
 
 	std::string name = "TESTimpl";
