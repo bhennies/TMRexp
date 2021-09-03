@@ -12,8 +12,7 @@ set(SOURCES
 	post/assign.cpp
 	post/atomic.cpp
 	post/easy.cpp
-	post/epoch.cpp
-	post/eval_cas.cpp
+        post/eval_cas.cpp
 	post/eval_eqneq.cpp
 	post/inout.cpp
 	post/mem.cpp

@@ -26,8 +26,6 @@ bool key_comparator::operator() (const Cfg& lhs, const Cfg& rhs) const{
 	cmp(lhs.smrstate, rhs.smrstate);
 	cmp(rhs.datasel0, lhs.datasel0);
 	cmp(rhs.datasel1, lhs.datasel1);
-	cmp(rhs.globalepoch, lhs.globalepoch);
-	cmp(rhs.epochsel, lhs.epochsel);
     cmp(rhs.readCriticalSelector, lhs.readCriticalSelector);
 	return false;
 }

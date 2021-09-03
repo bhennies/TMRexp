@@ -63,11 +63,8 @@ static inline bool can_interfere(const Cfg& cfg, const Cfg& interferer) {
 		return false;
 	}
 
-	if (cfg.globalepoch != interferer.globalepoch) {
-		return false;
-	}
 
-	if (cfg.epochsel != interferer.epochsel) {
+	if (cfg.readCriticalSelector != interferer.readCriticalSelector) {
 		return false;
 	}
 
