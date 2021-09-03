@@ -21,7 +21,7 @@ std::ostream& tmr::operator<<(std::ostream& os, const Cfg& cfg) {
 	os << ", offender=[" << cfg.offender[0] << ", " << cfg.offender[1] << "]";
     os << ", gracePeriodPhaseSel=" << cfg.gracePeriodPhaseSelector;
     os << ", readCriticalSel=" << cfg.readCriticalSelector;
-    os << ", inReadCritical=[" << cfg.inReadCritical[0] << ", " << cfg.inReadCritical[1] << "]";
+    //os << ", inReadCritical=[" << cfg.inReadCritical[0] << ", " << cfg.inReadCritical[1] << "]";
 	os << ", dataset0=[" << cfg.dataset0[0] << ", " << cfg.dataset0[1] << "]";
 	os << ", dataset1=[" << cfg.dataset1[0] << ", " << cfg.dataset1[1] << "]";
 	os << ", dataset2=[" << cfg.dataset2[0] << ", " << cfg.dataset2[1] << "]";

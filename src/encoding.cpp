@@ -17,7 +17,7 @@ bool cfg_comparator::operator() (const Cfg& lhs, const Cfg& rhs) const{
 	cmp(rhs.dataset1, lhs.dataset1);
 	cmp(rhs.dataset2, lhs.dataset2);
 	cmp(lhs.threadstate[0], rhs.threadstate[0]);
-    cmp(lhs.inReadCritical[0], rhs.inReadCritical[0]);
+    //cmp(lhs.inReadCritical[0], rhs.inReadCritical[0]);
 	return false;
 }
 
