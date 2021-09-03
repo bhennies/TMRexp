@@ -19,6 +19,7 @@ std::ostream& tmr::operator<<(std::ostream& os, const Cfg& cfg) {
 	os << ", threadstate=[" << cfg.threadstate[0] << ", " << cfg.threadstate[1] << "]";
 	os << ", arg=[" << cfg.arg[0] << ", " << cfg.arg[1] << "]";
 	os << ", offender=[" << cfg.offender[0] << ", " << cfg.offender[1] << "]";
+    os << ", globalGracePeriodPhase=" << cfg.globalGracePeriodPhase;
     os << ", gracePeriodPhaseSel=" << cfg.gracePeriodPhaseSelector;
     os << ", readCriticalSel=" << cfg.readCriticalSelector;
     //os << ", inReadCritical=[" << cfg.inReadCritical[0] << ", " << cfg.inReadCritical[1] << "]";

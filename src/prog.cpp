@@ -300,6 +300,9 @@ void ReadCriticalVarCondition::propagateFun(const Function *fun) {}
 
 void ReadCriticalSelCondition::propagateFun(const Function *fun) {}
 
+void GracePeriodCondition::propagateFun(const Function *fun) {
+}
+
 void Sequence::propagateFun(const Function* fun) {
 	Statement::propagateFun(fun);
 	for (const auto& s : _stmts) s->propagateFun(fun);
@@ -378,6 +381,9 @@ void ReadCriticalSelCondition::namecheck(const std::map<std::string, Variable*>&
     _cmp->namecheck(name2decl);
 }
 
+void GracePeriodCondition::namecheck(const std::map<std::string, Variable *> &name2decl) {
+}
+
 void Sequence::namecheck(const std::map<std::string, Variable*>& name2decl) {
 	for (const auto& stmt : _stmts) stmt->namecheck(name2decl);
 }
@@ -441,6 +447,12 @@ void SetAddArg::namecheck(const std::map<std::string, Variable*>& name2decl) {
 }
 
 void SetReadCritical::namecheck(const std::map<std::string, Variable *> &name2decl) {
+}
+
+void ToggleGlobalGracePeriod::namecheck(const std::map<std::string, Variable *> &name2decl) {
+}
+
+void StoreGPPhaseToRec::namecheck(const std::map<std::string, Variable *> &name2decl) {
 }
 
 void Function::namecheck(const std::map<std::string, Variable*>& name2decl) {
@@ -558,6 +570,12 @@ void FreeAll::checkRecInit(std::set<const Variable*>& fromAllocation) const {
 }
 
 void SetReadCritical::checkRecInit(std::set<const Variable*>& fromAllocation) const {
+}
+
+void ToggleGlobalGracePeriod::checkRecInit(std::set<const Variable *> &fromAllocation) const {
+}
+
+void StoreGPPhaseToRec::checkRecInit(std::set<const Variable *> &fromAllocation) const {
 }
 
 void Function::checkRecInit() const {
@@ -759,7 +777,11 @@ void ReadCriticalVarCondition::print(std::ostream &os) const {
 }
 
 void ReadCriticalSelCondition::print(std::ostream &os) const {
-    os << *_cmp << "->inReadCritical";
+    os << *_cmp << "->readCriticalSel";
+}
+
+void GracePeriodCondition::print(std::ostream &os) const {
+    os << *_cmp << "->readCriticalSel && (" << *_cmp << "->gracePeriodPhaseSel != GracePeriodPhase)" << std::endl;
 }
 
 std::ostream& tmr::operator<<(std::ostream& os, const Statement& stmt) {
@@ -880,7 +902,18 @@ void FreeAll::print(std::ostream& os, std::size_t indent) const {
 
 void SetReadCritical::print(std::ostream &os, std::size_t indent) const {
     printID;
-    os << "inReadCritical = " << _setTo << ";";
+    os << "__rec__->readCriticalSel = " << _setTo << ";";
+}
+
+void ToggleGlobalGracePeriod::print(std::ostream &os, std::size_t indent) const {
+    printID
+    os << "GracePeriodPhase = !GracePeriodPhase;" << std::endl;
+}
+
+
+void StoreGPPhaseToRec::print(std::ostream &os, std::size_t indent) const {
+    printID
+    os << "__rec__->gracePeriodPhaseSel = GracePeriodPhase;" << std::endl;
 }
 
 std::ostream& tmr::operator<<(std::ostream& os, const Function& fun) {
@@ -911,11 +944,9 @@ inline void printNodeStruct(std::ostream& os) {
 	INDENT(2);
 	os << "ptr_t next;" << std::endl;
 	INDENT(2);
-	os << "data_t data0;" << std::endl;
-	INDENT(2);
-	os << "data_t data1;" << std::endl;
-	INDENT(2);
-	os << "time_t epoch;" << std::endl;
+    os << "bool gracePeriodPhaseSel;" << std::endl;
+    INDENT(2)
+    os << "bool readCriticalSel;" << std::endl;
 	INDENT(1);
 	os << "}" << std::endl << std::endl;
 }
@@ -948,7 +979,7 @@ void Program::print(std::ostream& os) const {
 	for (std::size_t i = 1; i < _globals.size(); i++) os << ", " << _globals.at(i)->name();
 	os << ";" << std::endl;
 	INDENT(2);
-	os << "time_t Epoch;" << std::endl;
+	os << "bool GracePeriodPhase;" << std::endl;
 	// local ptr variables
 	std::cout << std::endl;
 	INDENT(1);
@@ -962,11 +993,9 @@ void Program::print(std::ostream& os) const {
 	os << ";" << std::endl;
 	// local predefined variables
 	INDENT(2);
-	os << "time_t epoch;" << std::endl;
-	INDENT(2);
 	os << "Set<data_t> set0, set1, set2;" << std::endl;
     INDENT(2);
-    os << "bool inReadCritical;" << std::endl;
+    //os << "bool inReadCritical;" << std::endl;
 	// free_all macro
 	os << std::endl;
 	printNodeStruct(os);
@@ -983,3 +1012,7 @@ void Program::print(std::ostream& os) const {
 	for (const auto& f : _funs) f->print(os, 1);
 	os << "END" << std::endl;
 }
+
+
+
+

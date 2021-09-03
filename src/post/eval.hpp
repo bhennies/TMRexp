@@ -37,6 +37,8 @@ namespace tmr {
 
     std::vector<Cfg> eval_rc_sel(const Cfg& cfg, const ReadCriticalSelCondition& cond, const Statement* nY, const Statement* nN, unsigned short tid);
 
+    std::vector<Cfg> eval_gp_cond(const Cfg& cfg, const GracePeriodCondition& cond, const Statement* nY, const Statement* nN, unsigned short tid);
+
 
     static std::vector<Cfg> eval_cond(const Cfg& cfg, const Conditional& stmt, unsigned short tid) {
 		const Statement* nextY = stmt.next_true_branch();
@@ -49,6 +51,7 @@ namespace tmr {
 			case Condition::NONDET: return eval_cond_nondet(cfg, static_cast<const NonDetCondition&>(stmt.cond()), nextY, nextN, tid);
             //case Condition::RC_VAR: return eval_rc_var(cfg, static_cast<const ReadCriticalVarCondition&>(stmt.cond()), nextY, nextN, tid);
             case Condition::RC_SEL: return eval_rc_sel(cfg, static_cast<const ReadCriticalSelCondition&>(stmt.cond()), nextY, nextN, tid);
+            case Condition::GPCOND: return eval_gp_cond(cfg, static_cast<const GracePeriodCondition&>(stmt.cond()), nextY, nextN, tid);
 			case Condition::TRUEC:
 				std::vector<Cfg> result;
 				result.push_back(mk_next_config(cfg, new Shape(*cfg.shape), nextY, tid));

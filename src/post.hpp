@@ -33,5 +33,6 @@ namespace tmr {
 	std::vector<Cfg> post(const Cfg& cfg, const SetClear& stmt, unsigned short tid);
 	std::vector<Cfg> post(const Cfg& cfg, const FreeAll& stmt, unsigned short tid);
     std::vector<Cfg> post(const Cfg& cfg, const SetReadCritical& stmt, unsigned short tid);
-
+    std::vector<Cfg> post(const Cfg& cfg, const ToggleGlobalGracePeriod& stmt, unsigned short tid);
+    std::vector<Cfg> post(const Cfg& cfg, const StoreGPPhaseToRec& stmt, unsigned short tid);
 }

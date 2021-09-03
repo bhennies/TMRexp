@@ -62,6 +62,7 @@ namespace tmr {
 		MultiInOut arg; // argument (value) of current function
 		MultiBool offender;
 		std::unique_ptr<Shape> shape;
+        bool globalGracePeriodPhase;
         bool gracePeriodPhaseSelector;
         bool readCriticalSelector;
         //MultiBool inReadCritical;
@@ -72,12 +73,12 @@ namespace tmr {
 
 		Cfg(std::array<const Statement*, 2> pc, MultiState smrstate, MultiMultiState threadstate, Shape* shape)
 		    : pc(pc), smrstate(smrstate), threadstate(threadstate), arg(DEFAULT_DATA_VALUE), offender(false), shape(shape),
-		      gracePeriodPhaseSelector(false), readCriticalSelector(false),
+		      globalGracePeriodPhase(false), gracePeriodPhaseSelector(false), readCriticalSelector(false),
 		      dataset0(DEFAULT_DATA_SET), dataset1(DEFAULT_DATA_SET), dataset2(DEFAULT_DATA_SET), owned(false)
 		{}
 		Cfg(const Cfg& cfg, Shape* shape)
 		    : pc(cfg.pc), smrstate(cfg.smrstate), threadstate(cfg.threadstate), arg(cfg.arg), offender(cfg.offender), shape(shape),
-              gracePeriodPhaseSelector(cfg.gracePeriodPhaseSelector), readCriticalSelector(cfg.readCriticalSelector),
+              globalGracePeriodPhase(cfg.globalGracePeriodPhase), gracePeriodPhaseSelector(cfg.gracePeriodPhaseSelector), readCriticalSelector(cfg.readCriticalSelector),
               dataset0(cfg.dataset0), dataset1(cfg.dataset1), dataset2(cfg.dataset2), owned(cfg.owned)
 		{}
 		Cfg copy() const;

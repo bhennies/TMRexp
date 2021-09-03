@@ -55,6 +55,9 @@ static inline bool can_interfere(const Cfg& cfg, const Cfg& interferer) {
 		return false;
 	}
 
+    if (cfg.globalGracePeriodPhase != interferer.globalGracePeriodPhase) {
+        return false;
+    }
 
 	if (cfg.readCriticalSelector != interferer.readCriticalSelector) {
 		return false;

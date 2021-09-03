@@ -119,7 +119,7 @@ namespace tmr {
 	class Condition {
 		public:
 			virtual ~Condition() = default;
-			enum Type { EQNEQ, CASC, TRUEC, COMPOUND, ORACLEC, NONDET, RC_VAR, RC_SEL };
+			enum Type { EQNEQ, CASC, TRUEC, COMPOUND, ORACLEC, NONDET, RC_VAR, RC_SEL, GPCOND };
 			virtual Type type() const = 0;
 			virtual void namecheck(const std::map<std::string, Variable*>& name2decl) = 0;
 			virtual void print(std::ostream& os) const = 0;
@@ -210,6 +210,18 @@ namespace tmr {
             const VarExpr& var() const { return *_cmp; }
     };
 
+    class GracePeriodCondition: public Condition {
+    private:
+        std::unique_ptr<VarExpr> _cmp;
+    public:
+        GracePeriodCondition(std::unique_ptr<VarExpr> cmp) : _cmp(std::move(cmp)) {}
+        void namecheck(const std::map<std::string, Variable*>& name2decl);
+        void print(std::ostream& os) const;
+        Type type() const { return Type::GPCOND; }
+        void propagateFun(const Function* fun);
+        const VarExpr& var() const { return *_cmp; }
+    };
+
 
 	/*********************** STATEMENT ***********************/
 
@@ -224,7 +236,7 @@ namespace tmr {
 		public:
 			enum Class {
 				SQZ, ASSIGN, MALLOC, ITE, WHILE, BREAK, CAS, SETNULL, ATOMIC, KILL, SETADD_ARG,
-				SETCOMBINE, SETCLEAR, FREEALL, INITREC, SETREADCRITICAL
+				SETCOMBINE, SETCLEAR, FREEALL, INITREC, SETREADCRITICAL, TOGGLEGP, STOREGPTOREC
 			};
 			virtual ~Statement() = default;
 			virtual Class clazz() const = 0;
@@ -514,6 +526,22 @@ namespace tmr {
             void checkRecInit(std::set<const Variable*>& fromAllocation) const;
     };
 
+    class ToggleGlobalGracePeriod : public Statement {
+    public:
+        Statement::Class clazz() const { return Statement::Class::TOGGLEGP; }
+        void print(std::ostream& os, std::size_t indent) const;
+        void namecheck(const std::map<std::string, Variable*>& name2decl);
+        void checkRecInit(std::set<const Variable*>& fromAllocation) const;
+    };
+
+    class StoreGPPhaseToRec: public Statement {
+    public:
+        Statement::Class clazz() const { return Statement::Class::STOREGPTOREC; }
+        void print(std::ostream& os, std::size_t indent) const;
+        void namecheck(const std::map<std::string, Variable*>& name2decl);
+        void checkRecInit(std::set<const Variable*>& fromAllocation) const;
+    };
+
 	/*********************** PROGRAM ***********************/
 
 	class Function {
@@ -588,7 +616,7 @@ namespace tmr {
 	std::unique_ptr<CASCondition> CasCond(std::unique_ptr<CompareAndSwap> cas);
 	std::unique_ptr<CompoundCondition> CompCond(std::unique_ptr<Condition> lhs, std::unique_ptr<Condition> rhs);
 	std::unique_ptr<NonDetCondition> NDCond();
-    std::unique_ptr<ReadCriticalVarCondition> RCCond();
+    //std::unique_ptr<ReadCriticalVarCondition> RCCond();
     std::unique_ptr<ReadCriticalSelCondition> RCCond(std::string name);
 
 	std::unique_ptr<Assignment> Assign (std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs);
@@ -611,6 +639,9 @@ namespace tmr {
 	std::unique_ptr<SetClear> Clear(std::size_t lhs);
 
     std::unique_ptr<SetReadCritical> SetRC(bool setTo);
+    std::unique_ptr<ToggleGlobalGracePeriod> ToggleGlobalGP();
+    std::unique_ptr<> StoreGlobalGPToRec();
+    std::unique_ptr<> GracePeriodCond();
 
 	std::unique_ptr<CompareAndSwap> CAS(std::unique_ptr<Expr> dst, std::unique_ptr<Expr> cmp, std::unique_ptr<Expr> src);
 

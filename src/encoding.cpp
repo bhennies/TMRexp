@@ -22,6 +22,7 @@ bool cfg_comparator::operator() (const Cfg& lhs, const Cfg& rhs) const{
 }
 
 bool key_comparator::operator() (const Cfg& lhs, const Cfg& rhs) const{
+    cmp(lhs.globalGracePeriodPhase, rhs.globalGracePeriodPhase)
 	cmp(lhs.smrstate, rhs.smrstate);
     cmp(rhs.readCriticalSelector, lhs.readCriticalSelector);
 	return false;
