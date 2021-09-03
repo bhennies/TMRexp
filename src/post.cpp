@@ -20,7 +20,6 @@ static std::vector<Cfg> get_post_cfgs(const Cfg& cfg, unsigned short tid) {
 		case Statement::CAS:        return tmr::post(cfg, static_cast<const        CompareAndSwap&>(stmt), tid);
 		case Statement::ASSIGN:     return tmr::post(cfg, static_cast<const            Assignment&>(stmt), tid);
 		case Statement::SETNULL:    return tmr::post(cfg, static_cast<const        NullAssignment&>(stmt), tid);
-		case Statement::WRITEREC:   return tmr::post(cfg, static_cast<const          WriteRecData&>(stmt), tid);
 		case Statement::INITREC:    return tmr::post(cfg, static_cast<const            InitRecPtr&>(stmt), tid);
 		case Statement::MALLOC:     return tmr::post(cfg, static_cast<const                Malloc&>(stmt), tid);
 		case Statement::BREAK:      return tmr::post(cfg, static_cast<const                 Break&>(stmt), tid);
@@ -28,7 +27,6 @@ static std::vector<Cfg> get_post_cfgs(const Cfg& cfg, unsigned short tid) {
 		case Statement::WHILE:      return tmr::post(cfg, static_cast<const                 While&>(stmt), tid);
 		case Statement::KILL:       return tmr::post(cfg, static_cast<const                Killer&>(stmt), tid);
 		case Statement::SETADD_ARG: return tmr::post(cfg, static_cast<const             SetAddArg&>(stmt), tid);
-		case Statement::SETADD_SEL: return tmr::post(cfg, static_cast<const             SetAddSel&>(stmt), tid);
 		case Statement::SETCOMBINE: return tmr::post(cfg, static_cast<const            SetCombine&>(stmt), tid);
 		case Statement::SETCLEAR:   return tmr::post(cfg, static_cast<const              SetClear&>(stmt), tid);
 		case Statement::FREEALL:    return tmr::post(cfg, static_cast<const               FreeAll&>(stmt), tid);

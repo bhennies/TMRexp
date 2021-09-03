@@ -221,13 +221,6 @@ inline MultiSet& getsetref(Cfg& cfg, std::size_t setid) {
 	}
 }
 
-inline DataValue getdatasel(const Cfg& cfg, std::size_t selid) {
-	switch (selid) {
-		case 0: return cfg.datasel0;
-		case 1: return cfg.datasel1;
-		default: throw std::logic_error("Unsupported data selector.");
-	}
-}
 
 inline void addtoset(Cfg& cfg, std::size_t setid, DataValue val, unsigned short tid) {
 	auto& dst = getsetref(cfg, setid);
@@ -278,30 +271,6 @@ std::vector<Cfg> tmr::post(const Cfg& cfg, const SetAddArg& stmt, unsigned short
 	return result;
 }
 
-std::vector<Cfg> tmr::post(const Cfg& cfg, const SetAddSel& stmt, unsigned short tid) {
-	// TODO: sel id
-	std::size_t lhs = mk_var_index(*cfg.shape, stmt.selector(), tid);
-
-	Shape* eqsplit = isolate_partial_concretisation(*cfg.shape, lhs, cfg.shape->index_REC(), EQ_);
-	Shape* neqsplit = isolate_partial_concretisation(*cfg.shape, lhs, cfg.shape->index_REC(), MT_GT_MF_GF_BT);
-
-	std::vector<Cfg> result;
-	result.reserve(3);
-
-	if (eqsplit) {
-		result.push_back(mk_next_config(cfg, eqsplit, tid));
-		addtoset(result.back(), stmt.setid(), getdatasel(cfg, stmt.selector().index()), tid);
-	}
-
-	if (neqsplit) {
-		result.push_back(mk_next_config(cfg, new Shape(*neqsplit), tid));
-		addtoset(result.back(), stmt.setid(), DataValue::DATA, tid);
-		result.push_back(mk_next_config(cfg, neqsplit, tid));
-		addtoset(result.back(), stmt.setid(), DataValue::OTHER, tid);
-	}
-
-	return result;
-}
 
 /******************************** REC INIT ********************************/
 

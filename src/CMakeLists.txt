@@ -14,8 +14,7 @@ set(SOURCES
 	post/easy.cpp
         post/eval_cas.cpp
 	post/eval_eqneq.cpp
-	post/inout.cpp
-	post/mem.cpp
+        post/mem.cpp
 	post/bools.cpp
 	fixpoint.cpp
 )

@@ -223,8 +223,8 @@ namespace tmr {
 
 		public:
 			enum Class {
-				SQZ, ASSIGN, MALLOC, ITE, WHILE, BREAK, WRITEREC, CAS, SETNULL, ATOMIC, KILL, SETADD_ARG,
-				SETADD_SEL, SETCOMBINE, SETCLEAR, FREEALL, INITREC, SETREADCRITICAL
+				SQZ, ASSIGN, MALLOC, ITE, WHILE, BREAK, CAS, SETNULL, ATOMIC, KILL, SETADD_ARG,
+				SETCOMBINE, SETCLEAR, FREEALL, INITREC, SETREADCRITICAL
 			};
 			virtual ~Statement() = default;
 			virtual Class clazz() const = 0;
@@ -311,24 +311,6 @@ namespace tmr {
 				assert(_lhs->clazz() == Expr::VAR || _lhs->clazz() == Expr::SEL);
 			}
 			const Expr& lhs() const { return *_lhs; }
-	};
-
-	class WriteRecData : public Statement {
-		public:
-			enum Type { FROM_ARG, FROM_NULL };
-
-		private:
-			std::size_t _sel_index;
-			Type _type;
-
-		public:
-			WriteRecData(std::size_t index, Type type) : _sel_index(index), _type(type) { assert(_sel_index < 2); }
-			Statement::Class clazz() const { return Statement::Class::WRITEREC; }
-			void namecheck(const std::map<std::string, Variable*>& name2decl);
-			void print(std::ostream& os, std::size_t indent) const;
-			std::size_t index() const { return _sel_index; }
-			Type type() const { return _type; }
-			void checkRecInit(std::set<const Variable*>& fromAllocation) const;
 	};
 
 
@@ -480,18 +462,6 @@ namespace tmr {
 			void checkRecInit(std::set<const Variable*>& fromAllocation) const;
 	};
 
-	class SetAddSel : public SetOperation {
-		private:
-			std::unique_ptr<Selector> _sel;
-
-		public:
-			SetAddSel(std::size_t setid, std::unique_ptr<Selector> sel) : SetOperation(setid), _sel(std::move(sel)) { assert(_sel->type() == DATA); }
-			Statement::Class clazz() const { return Statement::SETADD_SEL; }
-			void namecheck(const std::map<std::string, Variable*>& name2decl);
-			void print(std::ostream& os, std::size_t indent) const;
-			const Selector& selector() const { return *_sel; }
-			void checkRecInit(std::set<const Variable*>& fromAllocation) const;
-	};
 
 	class SetCombine : public SetOperation {
 		public:
@@ -623,8 +593,6 @@ namespace tmr {
 
 	std::unique_ptr<Assignment> Assign (std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs);
 	std::unique_ptr<NullAssignment> SetNull (std::unique_ptr<Expr> lhs);
-	std::unique_ptr<WriteRecData> WriteRecArg(std::size_t index);
-	std::unique_ptr<WriteRecData> WriteRecNull(std::size_t index);
 	std::unique_ptr<InitRecPtr> InitRec(std::string name);
 
 	std::unique_ptr<Ite> IfThen(std::unique_ptr<Condition> cond, std::unique_ptr<Sequence> ifs);
@@ -637,7 +605,6 @@ namespace tmr {
 	std::unique_ptr<FreeAll> Free(std::size_t setid);
 
 	std::unique_ptr<SetAddArg> AddArg(std::size_t lhs);
-	std::unique_ptr<SetAddSel> AddSel(std::size_t lhs, std::unique_ptr<Selector> sel);
 	std::unique_ptr<SetCombine> Combine(std::size_t lhs, std::size_t rhs, SetCombine::Type comb);
 	std::unique_ptr<SetCombine> SetAssign(std::size_t lhs, std::size_t rhs);
 	std::unique_ptr<SetCombine> SetMinus(std::size_t lhs, std::size_t rhs);

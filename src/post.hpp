@@ -26,11 +26,9 @@ namespace tmr {
 	std::vector<Cfg> post(const Cfg& cfg, const Malloc& stmt, unsigned short tid);
 	std::vector<Cfg> post(const Cfg& cfg, const Assignment& stmt, unsigned short tid);
 	std::vector<Cfg> post(const Cfg& cfg, const NullAssignment& stmt, unsigned short tid);
-	std::vector<Cfg> post(const Cfg& cfg, const WriteRecData& stmt, unsigned short tid);
 	std::vector<Cfg> post(const Cfg& cfg, const InitRecPtr& stmt, unsigned short tid);
 	std::vector<Cfg> post(const Cfg& cfg, const Killer& stmt, unsigned short tid);
 	std::vector<Cfg> post(const Cfg& cfg, const SetAddArg& stmt, unsigned short tid);
-	std::vector<Cfg> post(const Cfg& cfg, const SetAddSel& stmt, unsigned short tid);
 	std::vector<Cfg> post(const Cfg& cfg, const SetCombine& stmt, unsigned short tid);
 	std::vector<Cfg> post(const Cfg& cfg, const SetClear& stmt, unsigned short tid);
 	std::vector<Cfg> post(const Cfg& cfg, const FreeAll& stmt, unsigned short tid);

@@ -198,15 +198,6 @@ std::unique_ptr<NullAssignment> tmr::SetNull (std::unique_ptr<Expr> lhs) {
 	return res;
 }
 
-std::unique_ptr<WriteRecData> tmr::WriteRecArg(std::size_t index) {
-	std::unique_ptr<WriteRecData> res(new WriteRecData(index, WriteRecData::FROM_ARG));
-	return res;
-}
-
-std::unique_ptr<WriteRecData> tmr::WriteRecNull(std::size_t index) {
-	std::unique_ptr<WriteRecData> res(new WriteRecData(index, WriteRecData::FROM_NULL));
-	return res;
-}
 
 std::unique_ptr<InitRecPtr> tmr::InitRec(std::string name) {
 	std::unique_ptr<InitRecPtr> res(new InitRecPtr(Var(name)));
@@ -259,10 +250,6 @@ std::unique_ptr<CompareAndSwap> tmr::CAS(std::unique_ptr<Expr> dst, std::unique_
 
 std::unique_ptr<SetAddArg> tmr::AddArg(std::size_t lhs) {
 	return std::make_unique<SetAddArg>(lhs);
-}
-
-std::unique_ptr<SetAddSel> tmr::AddSel(std::size_t lhs, std::unique_ptr<Selector> sel) {
-	return std::make_unique<SetAddSel>(lhs, std::move(sel));
 }
 
 std::unique_ptr<SetCombine> tmr::Combine(std::size_t lhs, std::size_t rhs, SetCombine::Type type) {
@@ -411,9 +398,6 @@ void NullAssignment::namecheck(const std::map<std::string, Variable*>& name2decl
 	assert(_lhs->clazz() != Expr::VAR || _lhs->type() == POINTER);
 }
 
-void WriteRecData::namecheck(const std::map<std::string, Variable*>& name2decl) {
-}
-
 void InitRecPtr::namecheck(const std::map<std::string, Variable*>& name2decl) {
 	_rhs->namecheck(name2decl);
 	if (rhs().type() != POINTER) {
@@ -454,10 +438,6 @@ void SetAddArg::namecheck(const std::map<std::string, Variable*>& name2decl) {
 	if (!function().has_arg()) {
 		throw std::logic_error("Function argument used in function without argument.");
 	}
-}
-
-void SetAddSel::namecheck(const std::map<std::string, Variable*>& name2decl) {
-	_sel->namecheck(name2decl);
 }
 
 void SetReadCritical::namecheck(const std::map<std::string, Variable *> &name2decl) {
@@ -501,8 +481,6 @@ void Assignment::checkRecInit(std::set<const Variable*>& fromAllocation) const {
 void NullAssignment::checkRecInit(std::set<const Variable*>& fromAllocation) const {
 }
 
-void WriteRecData::checkRecInit(std::set<const Variable*>& fromAllocation) const {
-}
 
 void InitRecPtr::checkRecInit(std::set<const Variable*>& fromAllocation) const {
 	if (fromAllocation.count(&_rhs->decl()) == 0) {
@@ -569,8 +547,6 @@ void SetOperation::checkRecInit(std::set<const Variable*>& fromAllocation) const
 void SetAddArg::checkRecInit(std::set<const Variable*>& fromAllocation) const {
 }
 
-void SetAddSel::checkRecInit(std::set<const Variable*>& fromAllocation) const {
-}
 
 void SetCombine::checkRecInit(std::set<const Variable*>& fromAllocation) const {
 }
@@ -826,15 +802,6 @@ void NullAssignment::print(std::ostream& os, std::size_t indent) const {
 	os << lhs() << " = NULL;";
 }
 
-void WriteRecData::print(std::ostream& os, std::size_t indent) const {
-	printID;
-	os << "__rec__->data" << _sel_index << " = ";
-	switch (_type) {
-		case FROM_ARG: os << "__arg__" << ";"; break;
-		case FROM_NULL: os << "NULL" << ";"; break;
-	}
-}
-
 void InitRecPtr::print(std::ostream& os, std::size_t indent) const {
 	printID;
 	os << "__rec__ = " << rhs() << ":";
@@ -885,14 +852,6 @@ void SetAddArg::print(std::ostream& os, std::size_t indent) const {
 	printID;
 	printSet(setid());
 	os << ".add(__arg__);";
-}
-
-void SetAddSel::print(std::ostream& os, std::size_t indent) const {
-	printID;
-	printSet(setid());
-	os << ".add(";
-	_sel->print(os);
-	os << ");";
 }
 
 void SetCombine::print(std::ostream& os, std::size_t indent) const {
