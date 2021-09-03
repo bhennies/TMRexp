@@ -63,11 +63,8 @@ static inline bool can_interfere(const Cfg& cfg, const Cfg& interferer) {
 		return false;
 	}
 
-	if (cfg.globalepoch != interferer.globalepoch) {
-		return false;
-	}
 
-	if (cfg.epochsel != interferer.epochsel) {
+	if (cfg.readCriticalSelector != interferer.readCriticalSelector) {
 		return false;
 	}
 
@@ -185,7 +182,6 @@ std::unique_ptr<Cfg> extend_cfg(const Cfg& dst, const Cfg& interferer) {
 	res.dataset2[1] = interferer.dataset2[0];
 	res.threadstate[1] = interferer.threadstate[0];
 	res.owned[1] = interferer.owned[0];
-	res.localepoch[1] = interferer.localepoch[0];
 
 	// prune shape (1.3, 1.4)
 	return prune_local_relations(std::move(result));
@@ -203,7 +199,6 @@ static inline void project_away(Cfg& cfg, unsigned short extended_thread_tid) {
 	cfg.dataset0[extended_thread_tid] = DEFAULT_DATA_SET;
 	cfg.dataset1[extended_thread_tid] = DEFAULT_DATA_SET;
 	cfg.dataset2[extended_thread_tid] = DEFAULT_DATA_SET;
-	cfg.localepoch[extended_thread_tid] = DEFAULT_EPOCH;
 	// cfg.threadstate[1] = cfg.threadstate[2]; // TODO: ignore?
 	cfg.owned[1] = false;
 }

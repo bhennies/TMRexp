@@ -14,7 +14,6 @@ std::ostream& tmr::operator<<(std::ostream& os, const Cfg& cfg) {
 	os << ", pc1=";
 	if (cfg.pc[1]) os << *cfg.pc[1];
 	else os << "NULL";
-	os << ", epoch=" << cfg.globalepoch;
 	os << ", owned=[" << cfg.owned[0] << ", " << cfg.owned[1] << "]";
 	os << ", smrstate=" << cfg.smrstate;
 	os << ", threadstate=[" << cfg.threadstate[0] << ", " << cfg.threadstate[1] << "]";
@@ -22,11 +21,9 @@ std::ostream& tmr::operator<<(std::ostream& os, const Cfg& cfg) {
 	os << ", offender=[" << cfg.offender[0] << ", " << cfg.offender[1] << "]";
 	os << ", datasel0=" << cfg.datasel0;
 	os << ", datasel1=" << cfg.datasel1;
-	os << ", epochsel=" << cfg.epochsel << std::endl;
     os << ", gracePeriodPhaseSel=" << cfg.gracePeriodPhaseSelector;
     os << ", readCriticalSel=" << cfg.readCriticalSelector;
     os << ", inReadCritical=[" << cfg.inReadCritical[0] << ", " << cfg.inReadCritical[1] << "]";
-	os << ", localepoch=[" << cfg.localepoch[0] << ", " << cfg.localepoch[1] << "]";
 	os << ", dataset0=[" << cfg.dataset0[0] << ", " << cfg.dataset0[1] << "]";
 	os << ", dataset1=[" << cfg.dataset1[0] << ", " << cfg.dataset1[1] << "]";
 	os << ", dataset2=[" << cfg.dataset2[0] << ", " << cfg.dataset2[1] << "]";

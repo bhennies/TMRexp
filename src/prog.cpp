@@ -177,15 +177,6 @@ std::unique_ptr<CompoundCondition> tmr::CompCond(std::unique_ptr<Condition> lhs,
 	return res;
 }
 
-std::unique_ptr<EpochVarCondition> tmr::EpochCond() {
-	std::unique_ptr<EpochVarCondition> res(new EpochVarCondition());
-	return res;
-}
-
-std::unique_ptr<EpochSelCondition> tmr::EpochCond(std::string name) {
-	std::unique_ptr<EpochSelCondition> res(new EpochSelCondition(Var(name)));
-	return res;
-}
 
 std::unique_ptr<ReadCriticalVarCondition> tmr::RCCond() {
     return std::make_unique<ReadCriticalVarCondition>();
@@ -217,23 +208,8 @@ std::unique_ptr<WriteRecData> tmr::WriteRecNull(std::size_t index) {
 	return res;
 }
 
-std::unique_ptr<SetRecEpoch> tmr::SetEpoch() {
-	std::unique_ptr<SetRecEpoch> res(new SetRecEpoch());
-	return res;
-}
-
-std::unique_ptr<GetLocalEpochFromGlobalEpoch> tmr::GetEpoch() {
-	std::unique_ptr<GetLocalEpochFromGlobalEpoch> res(new GetLocalEpochFromGlobalEpoch());
-	return res;
-}
-
 std::unique_ptr<InitRecPtr> tmr::InitRec(std::string name) {
 	std::unique_ptr<InitRecPtr> res(new InitRecPtr(Var(name)));
-	return res;
-}
-
-std::unique_ptr<IncrementGlobalEpoch> tmr::Inc() {
-	std::unique_ptr<IncrementGlobalEpoch> res(new IncrementGlobalEpoch());
 	return res;
 }
 
@@ -333,10 +309,6 @@ void NonDetCondition::propagateFun(const Function* fun) {}
 
 void TrueCondition::propagateFun(const Function* fun) {}
 
-void EpochVarCondition::propagateFun(const Function* fun) {}
-
-void EpochSelCondition::propagateFun(const Function* fun) {}
-
 void ReadCriticalVarCondition::propagateFun(const Function *fun) {}
 
 void ReadCriticalSelCondition::propagateFun(const Function *fun) {}
@@ -413,13 +385,6 @@ void NonDetCondition::namecheck(const std::map<std::string, Variable*>& name2dec
 void TrueCondition::namecheck(const std::map<std::string, Variable*>& name2decl) {
 }
 
-void EpochVarCondition::namecheck(const std::map<std::string, Variable*>& name2decl) {
-}
-
-void EpochSelCondition::namecheck(const std::map<std::string, Variable*>& name2decl) {
-	_cmp->namecheck(name2decl);
-}
-
 void ReadCriticalVarCondition::namecheck(const std::map<std::string, Variable *> &name2decl) {}
 
 void ReadCriticalSelCondition::namecheck(const std::map<std::string, Variable*>& name2decl) {
@@ -449,12 +414,6 @@ void NullAssignment::namecheck(const std::map<std::string, Variable*>& name2decl
 void WriteRecData::namecheck(const std::map<std::string, Variable*>& name2decl) {
 }
 
-void SetRecEpoch::namecheck(const std::map<std::string, Variable*>& name2decl) {
-}
-
-void GetLocalEpochFromGlobalEpoch::namecheck(const std::map<std::string, Variable*>& name2decl) {
-}
-
 void InitRecPtr::namecheck(const std::map<std::string, Variable*>& name2decl) {
 	_rhs->namecheck(name2decl);
 	if (rhs().type() != POINTER) {
@@ -462,8 +421,6 @@ void InitRecPtr::namecheck(const std::map<std::string, Variable*>& name2decl) {
 	}
 }
 
-void IncrementGlobalEpoch::namecheck(const std::map<std::string, Variable*>& name2decl) {
-}
 
 void Malloc::namecheck(const std::map<std::string, Variable*>& name2decl) {
 	_var->namecheck(name2decl);
@@ -547,19 +504,10 @@ void NullAssignment::checkRecInit(std::set<const Variable*>& fromAllocation) con
 void WriteRecData::checkRecInit(std::set<const Variable*>& fromAllocation) const {
 }
 
-void SetRecEpoch::checkRecInit(std::set<const Variable*>& fromAllocation) const {
-}
-
-void GetLocalEpochFromGlobalEpoch::checkRecInit(std::set<const Variable*>& fromAllocation) const {
-}
-
 void InitRecPtr::checkRecInit(std::set<const Variable*>& fromAllocation) const {
 	if (fromAllocation.count(&_rhs->decl()) == 0) {
 		throw std::logic_error("__rec__ must be initialized from the last allocation.");
 	}
-}
-
-void IncrementGlobalEpoch::checkRecInit(std::set<const Variable*>& fromAllocation) const {
 }
 
 void Malloc::checkRecInit(std::set<const Variable*>& fromAllocation) const {
@@ -830,14 +778,6 @@ void TrueCondition::print(std::ostream& os) const {
 	os << "true";
 }
 
-void EpochVarCondition::print(std::ostream& os) const {
-	os << "epoch != Epoch";
-}
-
-void EpochSelCondition::print(std::ostream& os) const {
-	os << "epoch != " << *_cmp << "->epoch";
-}
-
 void ReadCriticalVarCondition::print(std::ostream &os) const {
     os << "inReadCritical";
 }
@@ -895,26 +835,10 @@ void WriteRecData::print(std::ostream& os, std::size_t indent) const {
 	}
 }
 
-void SetRecEpoch::print(std::ostream& os, std::size_t indent) const {
-	printID;
-	os << "__rec__->epoch = epoch;";
-}
-
-void GetLocalEpochFromGlobalEpoch::print(std::ostream& os, std::size_t indent) const {
-	printID;
-	os << "epoch = Epoch;";
-}
-
 void InitRecPtr::print(std::ostream& os, std::size_t indent) const {
 	printID;
 	os << "__rec__ = " << rhs() << ":";
 }
-
-void IncrementGlobalEpoch::print(std::ostream& os, std::size_t indent) const {
-	printID;
-	os << "Epoch = (Epoch + 1) mod 3;";
-}
-
 
 void Malloc::print(std::ostream& os, std::size_t indent) const {
 	printID;

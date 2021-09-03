@@ -31,10 +31,7 @@ namespace tmr {
 		result.push_back(mk_next_config(cfg, new Shape(*cfg.shape), nN, tid));
 		return result;
 	}
-	
-	std::vector<Cfg> eval_epoch_var(const Cfg& cfg, const EpochVarCondition& cond, const Statement* nY, const Statement* nN, unsigned short tid);
-	
-	std::vector<Cfg> eval_epoch_sel(const Cfg& cfg, const EpochSelCondition& cond, const Statement* nY, const Statement* nN, unsigned short tid);
+
 
     std::vector<Cfg> eval_rc_var(const Cfg& cfg, const ReadCriticalVarCondition& cond, const Statement* nY, const Statement* nN, unsigned short tid);
 
@@ -50,8 +47,6 @@ namespace tmr {
 			case Condition::COMPOUND: throw std::logic_error("Compound conditions are not supported here (only in linearization points).");
 			case Condition::ORACLEC: throw std::logic_error("Oracle conditions are not supported here (only in linearization points).");
 			case Condition::NONDET: return eval_cond_nondet(cfg, static_cast<const NonDetCondition&>(stmt.cond()), nextY, nextN, tid);
-			case Condition::EPOCH_VAR: return eval_epoch_var(cfg, static_cast<const EpochVarCondition&>(stmt.cond()), nextY, nextN, tid);
-			case Condition::EPOCH_SEL: return eval_epoch_sel(cfg, static_cast<const EpochSelCondition&>(stmt.cond()), nextY, nextN, tid);
             case Condition::RC_VAR: return eval_rc_var(cfg, static_cast<const ReadCriticalVarCondition&>(stmt.cond()), nextY, nextN, tid);
             case Condition::RC_SEL: return eval_rc_sel(cfg, static_cast<const ReadCriticalSelCondition&>(stmt.cond()), nextY, nextN, tid);
 			case Condition::TRUEC:

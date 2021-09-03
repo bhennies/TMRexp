@@ -64,12 +64,9 @@ namespace tmr {
 		std::unique_ptr<Shape> shape;
 		DataValue datasel0; // data0 selectors for special pointer
 		DataValue datasel1; // data1 selectors for special pointer
-		Epoch globalepoch;
-		Epoch epochsel;
         bool gracePeriodPhaseSelector;
         bool readCriticalSelector;
         MultiBool inReadCritical;
-		MultiEpoch localepoch;
 		MultiSet dataset0;
 		MultiSet dataset1;
 		MultiSet dataset2;
@@ -77,15 +74,15 @@ namespace tmr {
 
 		Cfg(std::array<const Statement*, 2> pc, MultiState smrstate, MultiMultiState threadstate, Shape* shape)
 		    : pc(pc), smrstate(smrstate), threadstate(threadstate), arg(DEFAULT_DATA_VALUE), offender(false), shape(shape),
-		      datasel0(DEFAULT_DATA_VALUE), datasel1(DEFAULT_DATA_VALUE), globalepoch(DEFAULT_EPOCH), epochsel(DEFAULT_EPOCH),
-		      gracePeriodPhaseSelector(false), readCriticalSelector(false), inReadCritical(false), localepoch(DEFAULT_EPOCH),
+		      datasel0(DEFAULT_DATA_VALUE), datasel1(DEFAULT_DATA_VALUE),
+		      gracePeriodPhaseSelector(false), readCriticalSelector(false), inReadCritical(false),
 		      dataset0(DEFAULT_DATA_SET), dataset1(DEFAULT_DATA_SET), dataset2(DEFAULT_DATA_SET), owned(false)
 		{}
 		Cfg(const Cfg& cfg, Shape* shape)
 		    : pc(cfg.pc), smrstate(cfg.smrstate), threadstate(cfg.threadstate), arg(cfg.arg), offender(cfg.offender), shape(shape),
-		      datasel0(cfg.datasel0), datasel1(cfg.datasel1), globalepoch(cfg.globalepoch), epochsel(cfg.epochsel),
+		      datasel0(cfg.datasel0), datasel1(cfg.datasel1),
               gracePeriodPhaseSelector(cfg.gracePeriodPhaseSelector), readCriticalSelector(cfg.readCriticalSelector), inReadCritical(cfg.inReadCritical),
-		      localepoch(cfg.localepoch), dataset0(cfg.dataset0), dataset1(cfg.dataset1), dataset2(cfg.dataset2), owned(cfg.owned)
+		      dataset0(cfg.dataset0), dataset1(cfg.dataset1), dataset2(cfg.dataset2), owned(cfg.owned)
 		{}
 		Cfg copy() const;
 	};
