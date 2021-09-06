@@ -277,11 +277,11 @@ std::unique_ptr<SetReadCritical> tmr::SetRC(bool setTo) {
 }
 
 std::unique_ptr<ToggleGlobalGracePeriod> tmr::ToggleGlobalGP() {
-    return {};
+    return std::make_unique<ToggleGlobalGracePeriod>();
 }
 
 std::unique_ptr<StoreGPPhaseToRec> tmr::StoreGlobalGPToRec() {
-    return {};
+    return std::make_unique<StoreGPPhaseToRec>();
 }
 
 std::unique_ptr<Function> tmr::Fun(std::string name, std::unique_ptr<Sequence> body, bool has_arg) {
@@ -317,7 +317,8 @@ void GracePeriodCondition::propagateFun(const Function *fun) {
 
 void Sequence::propagateFun(const Function* fun) {
 	Statement::propagateFun(fun);
-	for (const auto& s : _stmts) s->propagateFun(fun);
+	for (const auto& s : _stmts)
+        s->propagateFun(fun);
 }
 
 
