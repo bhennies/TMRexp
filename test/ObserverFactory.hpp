@@ -96,8 +96,8 @@ namespace tmr {
 	static std::unique_ptr<Observer> base_observer_with_EBR_assumption(const Program& prog) {
 		// get functions to react on
 		const auto& f_retire = find(prog, "retire");
-		const auto& f_enterQ = find(prog, "enterQ");
-		const auto& f_leaveQ = find(prog, "leaveQ");
+		const auto& f_enterQ = find(prog, "readEnd");
+		const auto& f_leaveQ = find(prog, "readBegin");
 		
 		// state names
 		std::string n_freed     = "base:freed";

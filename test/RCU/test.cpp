@@ -58,8 +58,8 @@ static std::unique_ptr<Program> mk_program() {
 		{"cur", "tmp"},
 		std::move(init),
 		std::move(initthread),
-		Fun("fun1", std::move(fun1), false),
-		Fun("fun2", std::move(fun2), false),
+		Fun("readBegin", std::move(fun1), false),
+		Fun("readEnd", std::move(fun2), false),
 		Fun("retire", std::move(retire), true)
 	);
 
@@ -70,5 +70,5 @@ static std::unique_ptr<Program> mk_program() {
 int main(int argc, char *argv[]) {
 	// make program and observer
 	std::unique_ptr<Program> program = mk_program();
-	return run_test(*program);
+	return run_rcu_with_inv(*program);
 }
