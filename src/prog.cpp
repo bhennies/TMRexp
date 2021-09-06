@@ -982,10 +982,12 @@ void SetGlobalLock::print(std::ostream &os, std::size_t indent) const {
 }
 
 void MutexLock::print(std::ostream &os, std::size_t indent) const {
+    printID
     os << "mutex_lock();" << std::endl;
 }
 
 void MutexUnlock::print(std::ostream &os, std::size_t indent) const {
+    printID
     os << "mutex_unlock();" << std::endl;
 }
 
