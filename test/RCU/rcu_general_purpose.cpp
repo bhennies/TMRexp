@@ -28,7 +28,7 @@ static std::unique_ptr<Program> mk_program() {
                             Kill("tmp")
                             )),
                             InitRec("cur"),
-                            SetRC(false),
+                            //SetRC(false),
                             Kill("cur"),
                             Kill("tmp")
                             );
@@ -54,7 +54,7 @@ static std::unique_ptr<Program> mk_program() {
                                Sqz(
                                        Loop(Sqz(
                                                IfThenElse(GracePeriodCond("cur"),
-                                                          Sqz(),
+                                                          Sqz(AddArg(0)),
                                                           Sqz(
                                                                   Brk()
                                                                   ))
@@ -65,9 +65,8 @@ static std::unique_ptr<Program> mk_program() {
                                        ))
                  )
             ),
-        Kill("cur"),
             // update counter and wait
-            ToggleGlobalGP(),
+            /*ToggleGlobalGP(),
             Assign(Var("cur"), Var("RCUrecs")),
             Loop(Sqz(
                          IfThenElse(EqCond(Var("cur"), Null()),
@@ -86,7 +85,7 @@ static std::unique_ptr<Program> mk_program() {
                                             Kill("tmp")
                                     ))
                  )
-            ),
+            ),*/
             Kill("cur"),
             Free(0),
             Clear(0)
@@ -109,6 +108,6 @@ static std::unique_ptr<Program> mk_program() {
 int main(int argc, char *argv[]) {
     // make program and observer
     std::unique_ptr<Program> program = mk_program();
-    return run_rcu(*program);
+    return run_rcu_with_inv(*program);
 }
 
