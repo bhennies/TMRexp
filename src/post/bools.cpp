@@ -49,6 +49,25 @@ std::vector<Cfg> tmr::post(const Cfg& cfg, const StoreGPPhaseToRec& stmt, unsign
     return result;
 }*/
 
+std::vector<Cfg> tmr::post(const Cfg& cfg, const MutexLock& stmt, unsigned short tid) {
+    CHECK_STMT;
+    std::vector<Cfg> result;
+    if (cfg.globalRCULock) {
+        result.push_back(cfg.copy());
+    } else {
+        result = mk_next_config_vec(cfg, new Shape(*cfg.shape), tid);
+        result.back().globalRCULock = true;
+    }
+    return result;
+}
+
+std::vector<Cfg> tmr::post(const Cfg& cfg, const MutexUnlock& stmt, unsigned short tid) {
+    CHECK_STMT;
+    auto result = mk_next_config_vec(cfg, new Shape(*cfg.shape), tid);
+    result.back().globalRCULock = false;
+    return result;
+}
+
 std::vector<Cfg> tmr::eval_lock_cond(const Cfg& cfg, const LockIsTakenCondition& cond, const Statement* nY, const Statement* nN, unsigned short tid) {
     // checks: globalRCULock
     std::vector<Cfg> result;
@@ -114,3 +133,5 @@ std::vector<Cfg> tmr::eval_gp_cond(const Cfg& cfg, const GracePeriodCondition& c
     return result;
 
 }
+
+

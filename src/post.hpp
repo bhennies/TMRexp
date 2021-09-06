@@ -36,4 +36,8 @@ namespace tmr {
     std::vector<Cfg> post(const Cfg& cfg, const ToggleGlobalGracePeriod& stmt, unsigned short tid);
     std::vector<Cfg> post(const Cfg& cfg, const StoreGPPhaseToRec& stmt, unsigned short tid);
     std::vector<Cfg> post(const Cfg& cfg, const SetGlobalLock& stmt, unsigned short tid);
+    std::vector<Cfg> post(const Cfg& cfg, const MutexLock& stmt, unsigned short tid);
+    std::vector<Cfg> post(const Cfg& cfg, const MutexUnlock& stmt, unsigned short tid);
+
+
 }

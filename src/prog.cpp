@@ -309,6 +309,14 @@ std::unique_ptr<Sequence> tmr::mutex_unlock() {
     return Sqz(SetLock(false));
 }
 
+std::unique_ptr<MutexLock> tmr::Mutex_lock() {
+    return std::make_unique<MutexLock>();
+}
+
+std::unique_ptr<MutexUnlock> tmr::Mutex_unlock() {
+    return std::make_unique<MutexUnlock>();
+}
+
 
 /******************************** FUNCTION PROPAGATION ********************************/
 
@@ -494,6 +502,10 @@ void StoreGPPhaseToRec::namecheck(const std::map<std::string, Variable *> &name2
 
 void SetGlobalLock::namecheck(const std::map<std::string, Variable *> &name2decl) {}
 
+void MutexLock::namecheck(const std::map<std::string, Variable *> &name2decl) {}
+
+void MutexUnlock::namecheck(const std::map<std::string, Variable *> &name2decl) {}
+
 void Function::namecheck(const std::map<std::string, Variable*>& name2decl) {
 	_stmts->namecheck(name2decl);
 }
@@ -618,6 +630,10 @@ void StoreGPPhaseToRec::checkRecInit(std::set<const Variable *> &fromAllocation)
 }
 
 void SetGlobalLock::checkRecInit(std::set<const Variable *> &fromAllocation) const {}
+
+void MutexLock::checkRecInit(std::set<const Variable *> &fromAllocation) const {}
+
+void MutexUnlock::checkRecInit(std::set<const Variable *> &fromAllocation) const {}
 
 void Function::checkRecInit() const {
 	std::set<const Variable*> fromAllocation;
@@ -963,6 +979,14 @@ void StoreGPPhaseToRec::print(std::ostream &os, std::size_t indent) const {
 
 void SetGlobalLock::print(std::ostream &os, std::size_t indent) const {
     os << "globalRCULock = " << _setTo << ";" << std::endl;
+}
+
+void MutexLock::print(std::ostream &os, std::size_t indent) const {
+    os << "mutex_lock();" << std::endl;
+}
+
+void MutexUnlock::print(std::ostream &os, std::size_t indent) const {
+    os << "mutex_unlock();" << std::endl;
 }
 
 std::ostream& tmr::operator<<(std::ostream& os, const Function& fun) {

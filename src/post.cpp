@@ -34,7 +34,10 @@ static std::vector<Cfg> get_post_cfgs(const Cfg& cfg, unsigned short tid) {
         case Statement::STOREGPTOREC: return tmr::post(cfg, static_cast<const   StoreGPPhaseToRec&>(stmt), tid);
         case Statement::TOGGLEGP:   return tmr::post(cfg, static_cast<const ToggleGlobalGracePeriod&>(stmt), tid);
         case Statement::SETLOCK:    return tmr::post(cfg, static_cast<const         SetGlobalLock&>(stmt), tid);
-	}
+        case Statement::MLOCK:      return tmr::post(cfg, static_cast<const             MutexLock&>(stmt), tid);
+        case Statement::MUNLOCK:      return tmr::post(cfg, static_cast<const         MutexUnlock&>(stmt), tid);
+
+    }
 	assert(false);
 }
 

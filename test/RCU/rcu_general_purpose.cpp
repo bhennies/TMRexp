@@ -42,10 +42,10 @@ static std::unique_ptr<Program> mk_program() {
             SetRC(false)
             );
 
-    auto retire = Sqz(AtomicSqz(
+    auto retire = Sqz(
             AddArg(0),
             // update counter and wait
-            mutex_lock(),
+            Mutex_lock(),
             ToggleGlobalGP(),
             Assign(Var("cur"), Var("RCUrecs")),
             Loop(Sqz(
@@ -90,8 +90,8 @@ static std::unique_ptr<Program> mk_program() {
             Kill("cur"),
             Free(0),
             Clear(0),
-            mutex_unlock()
-    ));
+            Mutex_unlock()
+    );
 
     auto prog = Prog(
             name,

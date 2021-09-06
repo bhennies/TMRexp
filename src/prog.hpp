@@ -565,10 +565,16 @@ namespace tmr {
 
     class MutexLock : public Statement {
         Statement::Class clazz() const { return Statement::Class::MLOCK; }
+        void print(std::ostream& os, std::size_t indent) const;
+        void namecheck(const std::map<std::string, Variable*>& name2decl);
+        void checkRecInit(std::set<const Variable*>& fromAllocation) const;
     };
 
-    class MutxUnlock : public Statement {
+    class MutexUnlock : public Statement {
         Statement::Class clazz() const { return Statement::Class::MUNLOCK; }
+        void print(std::ostream& os, std::size_t indent) const;
+        void namecheck(const std::map<std::string, Variable*>& name2decl);
+        void checkRecInit(std::set<const Variable*>& fromAllocation) const;
     };
 
 	/*********************** PROGRAM ***********************/
@@ -676,6 +682,9 @@ namespace tmr {
 
     std::unique_ptr<Sequence> mutex_lock();
     std::unique_ptr<Sequence> mutex_unlock();
+
+    std::unique_ptr<MutexLock> Mutex_lock();
+    std::unique_ptr<MutexUnlock> Mutex_unlock();
 
 
     std::unique_ptr<CompareAndSwap> CAS(std::unique_ptr<Expr> dst, std::unique_ptr<Expr> cmp, std::unique_ptr<Expr> src);

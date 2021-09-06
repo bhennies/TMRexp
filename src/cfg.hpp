@@ -79,7 +79,7 @@ namespace tmr {
 		{}
 		Cfg(const Cfg& cfg, Shape* shape)
 		    : pc(cfg.pc), smrstate(cfg.smrstate), threadstate(cfg.threadstate), arg(cfg.arg), offender(cfg.offender), shape(shape),
-              globalRCULock(false), globalGracePeriodPhase(cfg.globalGracePeriodPhase), gracePeriodPhaseSelector(cfg.gracePeriodPhaseSelector), readCriticalSelector(cfg.readCriticalSelector),
+              globalRCULock(cfg.globalRCULock), globalGracePeriodPhase(cfg.globalGracePeriodPhase), gracePeriodPhaseSelector(cfg.gracePeriodPhaseSelector), readCriticalSelector(cfg.readCriticalSelector),
               dataset0(cfg.dataset0), dataset1(cfg.dataset1), dataset2(cfg.dataset2), owned(cfg.owned)
 		{}
 		Cfg copy() const;
