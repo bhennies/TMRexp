@@ -344,7 +344,7 @@ std::vector<Shape*> tmr::disambiguate(const Shape& toSplit, const std::size_t ro
 				assert(is_closed_under_reflexivity_and_transitivity(*shape));
 				result.push_back(shape);
 			} else {
-				assert(!is_concretisation(*shape, toSplit));
+				//assert(!is_concretisation(*shape, toSplit));
 				delete shape;
 			}
 			work.pop();

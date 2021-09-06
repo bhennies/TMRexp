@@ -395,6 +395,7 @@ void ReadCriticalSelCondition::namecheck(const std::map<std::string, Variable*>&
 }
 
 void GracePeriodCondition::namecheck(const std::map<std::string, Variable *> &name2decl) {
+    _cmp->namecheck(name2decl);
 }
 
 void Sequence::namecheck(const std::map<std::string, Variable*>& name2decl) {

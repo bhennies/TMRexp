@@ -37,17 +37,26 @@ static std::unique_ptr<Program> mk_program() {
 	auto fun2 = Sqz(SetRC(false)
 	);
 
+    auto fun3 = Sqz(SetNull(Var("RCUrecs")));
+
 	// retire
 	auto retire = Sqz(
             AddArg(0),
             Assign(Var("cur"), Var("RCUrecs")),
-            IfThenElse(RCCond("cur"),
-                       Sqz(),
-                       Sqz(Free(0),
-                       Clear(0)))
+            Loop(Sqz(
+            IfThenElse(EqCond(Var("cur"), Null()), Sqz(
+                       Free(0),
+                       Clear(0)),
+                       Sqz(
+                           IfThen(GracePeriodCond("cur"),
+                                      Sqz(Brk())
+                                      ),
+                       Assign(Var("tmp"), Next("cur")),
+                       Assign(Var("cur"), Var("tmp")),
+                       Kill("tmp")
+                       )
 
-
-	);
+            ))));
 
 
 	std::string name = "TESTimpl";
@@ -61,6 +70,7 @@ static std::unique_ptr<Program> mk_program() {
 		Fun("readBegin", std::move(fun1), false),
 		Fun("readEnd", std::move(fun2), false),
 		Fun("retire", std::move(retire), true)
+        //, Fun("fun3", std::move(fun3), false)
 	);
 
 	return prog;

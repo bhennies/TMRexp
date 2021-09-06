@@ -82,7 +82,7 @@ std::vector<Cfg> tmr::eval_gp_cond(const Cfg& cfg, const GracePeriodCondition& c
     if (eqsplit) {
         // check cond
         result.push_back(Cfg(cfg, eqsplit));
-        bool cres = cfg.readCriticalSelector && cfg.gracePeriodPhaseSelector != cfg.globalGracePeriodPhase;
+        bool cres = cfg.readCriticalSelector && (cfg.gracePeriodPhaseSelector != cfg.globalGracePeriodPhase);
         result.back().pc[tid] = cres ? nY : nN;
     }
 
