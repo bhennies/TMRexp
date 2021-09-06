@@ -102,7 +102,7 @@ inline bool drop_enter_cfg(const Cfg& cfg, unsigned short tid) {
 
 /******************************** POST FOR ONE THREAD ********************************/
 
-#define DEBUG_POST_WITH_SHAPE true
+#define DEBUG_POST_WITH_SHAPE false
 #define DEBUG_POST_WITHOUT_SHAPE false
 
 inline void debug_post_input(const Cfg& cfg) {
