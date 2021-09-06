@@ -640,8 +640,8 @@ namespace tmr {
 
     std::unique_ptr<SetReadCritical> SetRC(bool setTo);
     std::unique_ptr<ToggleGlobalGracePeriod> ToggleGlobalGP();
-    std::unique_ptr<> StoreGlobalGPToRec();
-    std::unique_ptr<> GracePeriodCond();
+    std::unique_ptr<StoreGPPhaseToRec> StoreGlobalGPToRec();
+    std::unique_ptr<GracePeriodCondition> GracePeriodCond(std::string name);
 
 	std::unique_ptr<CompareAndSwap> CAS(std::unique_ptr<Expr> dst, std::unique_ptr<Expr> cmp, std::unique_ptr<Expr> src);
 

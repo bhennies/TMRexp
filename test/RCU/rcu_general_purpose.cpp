@@ -28,38 +28,78 @@ static std::unique_ptr<Program> mk_program() {
                             Kill("tmp")
                             )),
                             InitRec("cur"),
-                            GetEpoch(),
-                            SetEpoch(),
+                            SetRC(false),
                             Kill("cur"),
                             Kill("tmp")
                             );
 
     auto readBegin = Sqz(AtomicSqz(
-            Assign(Next("readSet"), Var("__rec__")),
-            Assign(Var("readSet"), Var("__rec__") )
-            ));
+                SetRC(true),
+                StoreGlobalGPToRec()
+    ));
 
-    auto readEnd = Sqz();
-
-    auto writeBegin = Sqz();
-
-    auto writeEnd = Sqz();
+    auto readEnd = Sqz(
+            SetRC(false)
+            );
 
     auto retire = Sqz(
-            AddArg(2),
-            Free(2)
-            );
+            AddArg(0),
+            // update counter and wait
+            ToggleGlobalGP(),
+            Assign(Var("cur"), Var("RCUrecs")),
+            Loop(Sqz(
+                    IfThenElse(EqCond(Var("cur"), Null()),
+                               Sqz(
+                               Brk()),
+                               Sqz(
+                                       Loop(Sqz(
+                                               IfThenElse(GracePeriodCond("cur"),
+                                                          Sqz(),
+                                                          Sqz(
+                                                                  Brk()
+                                                                  ))
+                                               )),
+                                       Assign(Var("tmp"), Next("cur")),
+                                       Assign(Var("cur"), Var("tmp")),
+                                       Kill("tmp")
+                                       ))
+                 )
+            ),
+        Kill("cur"),
+            // update counter and wait
+            ToggleGlobalGP(),
+            Assign(Var("cur"), Var("RCUrecs")),
+            Loop(Sqz(
+                         IfThenElse(EqCond(Var("cur"), Null()),
+                                    Sqz(
+                                            Brk()),
+                                    Sqz(
+                                            Loop(Sqz(
+                                                    IfThenElse(GracePeriodCond("cur"),
+                                                               Sqz(),
+                                                               Sqz(
+                                                                       Brk()
+                                                               ))
+                                            )),
+                                            Assign(Var("tmp"), Next("cur")),
+                                            Assign(Var("cur"), Var("tmp")),
+                                            Kill("tmp")
+                                    ))
+                 )
+            ),
+            Kill("cur"),
+            Free(0),
+            Clear(0)
+    );
 
     auto prog = Prog(
             name,
-            {"RCUrecs", "lock"},
-            {"cur"},
+            {"RCUrecs"},
+            {"cur", "tmp"},
             std::move(init),
             std::move(initthread),
             Fun("readBegin", std::move(readBegin), false),
             Fun("readEnd", std::move(readEnd), false),
-            Fun("writeBegin", std::move(writeBegin), false),
-            Fun("writeEnd", std::move(writeEnd), false),
             Fun("retire", std::move(retire), true)
         );
 

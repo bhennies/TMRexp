@@ -178,8 +178,12 @@ std::unique_ptr<CompoundCondition> tmr::CompCond(std::unique_ptr<Condition> lhs,
 }
 
 
-std::unique_ptr<ReadCriticalVarCondition> tmr::RCCond() {
+/*std::unique_ptr<ReadCriticalVarCondition> tmr::RCCond() {
     return std::make_unique<ReadCriticalVarCondition>();
+}*/
+
+std::unique_ptr<GracePeriodCondition> tmr::GracePeriodCond(std::string name) {
+    return std::make_unique<GracePeriodCondition>(Var(name));
 }
 
 std::unique_ptr<ReadCriticalSelCondition> tmr::RCCond(std::string name) {
@@ -270,6 +274,14 @@ std::unique_ptr<SetClear> tmr::Clear(std::size_t lhs) {
 
 std::unique_ptr<SetReadCritical> tmr::SetRC(bool setTo) {
     return std::make_unique<SetReadCritical>(setTo);
+}
+
+std::unique_ptr<ToggleGlobalGracePeriod> tmr::ToggleGlobalGP() {
+    return {};
+}
+
+std::unique_ptr<StoreGPPhaseToRec> tmr::StoreGlobalGPToRec() {
+    return {};
 }
 
 std::unique_ptr<Function> tmr::Fun(std::string name, std::unique_ptr<Sequence> body, bool has_arg) {
@@ -937,6 +949,8 @@ std::ostream& tmr::operator<<(std::ostream& os, const Program& prog) {
 	prog.print(os);
 	return os;
 }
+
+
 
 inline void printNodeStruct(std::ostream& os) {
 	INDENT(1);
