@@ -119,7 +119,7 @@ namespace tmr {
 	class Condition {
 		public:
 			virtual ~Condition() = default;
-			enum Type { EQNEQ, CASC, TRUEC, COMPOUND, ORACLEC, NONDET, RC_VAR, RC_SEL, GPCOND };
+			enum Type { EQNEQ, CASC, TRUEC, COMPOUND, ORACLEC, NONDET, RC_VAR, RC_SEL, GPCOND, LOCK };
 			virtual Type type() const = 0;
 			virtual void namecheck(const std::map<std::string, Variable*>& name2decl) = 0;
 			virtual void print(std::ostream& os) const = 0;
@@ -222,6 +222,14 @@ namespace tmr {
         const VarExpr& var() const { return *_cmp; }
     };
 
+    class LockIsTakenCondition: public Condition {
+    public:
+        void namecheck(const std::map<std::string, Variable*>& name2decl);
+        void print(std::ostream& os) const;
+        Type type() const { return Type::LOCK; }
+        void propagateFun(const Function* fun);
+    };
+
 
 	/*********************** STATEMENT ***********************/
 
@@ -236,7 +244,8 @@ namespace tmr {
 		public:
 			enum Class {
 				SQZ, ASSIGN, MALLOC, ITE, WHILE, BREAK, CAS, SETNULL, ATOMIC, KILL, SETADD_ARG,
-				SETCOMBINE, SETCLEAR, FREEALL, INITREC, SETREADCRITICAL, TOGGLEGP, STOREGPTOREC
+				SETCOMBINE, SETCLEAR, FREEALL, INITREC, SETREADCRITICAL, TOGGLEGP, STOREGPTOREC,
+                SETLOCK, MLOCK, MUNLOCK
 			};
 			virtual ~Statement() = default;
 			virtual Class clazz() const = 0;
@@ -542,6 +551,26 @@ namespace tmr {
         void checkRecInit(std::set<const Variable*>& fromAllocation) const;
     };
 
+    class SetGlobalLock : public Statement {
+    private:
+        bool _setTo;
+    public:
+        SetGlobalLock(bool setTo) : _setTo(setTo) {}
+        Statement::Class clazz() const { return Statement::Class::SETLOCK; }
+        bool setTo() const { return _setTo;}
+        void namecheck(const std::map<std::string, Variable*>& name2decl);
+        void print(std::ostream& os, std::size_t indent) const;
+        void checkRecInit(std::set<const Variable*>& fromAllocation) const;
+    };
+
+    class MutexLock : public Statement {
+        Statement::Class clazz() const { return Statement::Class::MLOCK; }
+    };
+
+    class MutxUnlock : public Statement {
+        Statement::Class clazz() const { return Statement::Class::MUNLOCK; }
+    };
+
 	/*********************** PROGRAM ***********************/
 
 	class Function {
@@ -618,6 +647,7 @@ namespace tmr {
 	std::unique_ptr<NonDetCondition> NDCond();
     //std::unique_ptr<ReadCriticalVarCondition> RCCond();
     std::unique_ptr<ReadCriticalSelCondition> RCCond(std::string name);
+    std::unique_ptr<LockIsTakenCondition> LockIsTaken();
 
 	std::unique_ptr<Assignment> Assign (std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs);
 	std::unique_ptr<NullAssignment> SetNull (std::unique_ptr<Expr> lhs);
@@ -642,8 +672,13 @@ namespace tmr {
     std::unique_ptr<ToggleGlobalGracePeriod> ToggleGlobalGP();
     std::unique_ptr<StoreGPPhaseToRec> StoreGlobalGPToRec();
     std::unique_ptr<GracePeriodCondition> GracePeriodCond(std::string name);
+    std::unique_ptr<SetGlobalLock> SetLock(bool setTo);
 
-	std::unique_ptr<CompareAndSwap> CAS(std::unique_ptr<Expr> dst, std::unique_ptr<Expr> cmp, std::unique_ptr<Expr> src);
+    std::unique_ptr<Sequence> mutex_lock();
+    std::unique_ptr<Sequence> mutex_unlock();
+
+
+    std::unique_ptr<CompareAndSwap> CAS(std::unique_ptr<Expr> dst, std::unique_ptr<Expr> cmp, std::unique_ptr<Expr> src);
 
 	std::unique_ptr<Function> Fun(std::string name, std::unique_ptr<Sequence> body, bool has_arg);
 

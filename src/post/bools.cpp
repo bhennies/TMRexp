@@ -16,6 +16,13 @@ std::vector<Cfg> tmr::post(const Cfg& cfg, const SetReadCritical& stmt, unsigned
     return result;
 }
 
+std::vector<Cfg> tmr::post(const Cfg& cfg, const SetGlobalLock& stmt, unsigned short tid) {
+    CHECK_STMT;
+    auto result = mk_next_config_vec(cfg, new Shape(*cfg.shape), tid);
+    result.back().globalRCULock = stmt.setTo();
+    return result;
+}
+
 std::vector<Cfg> tmr::post(const Cfg& cfg, const ToggleGlobalGracePeriod& stmt, unsigned short tid) {
    CHECK_STMT;
    auto result = mk_next_config_vec(cfg, new Shape(*cfg.shape), tid);
@@ -41,6 +48,16 @@ std::vector<Cfg> tmr::post(const Cfg& cfg, const StoreGPPhaseToRec& stmt, unsign
     result.back().pc[tid] = cres ? nY : nN;
     return result;
 }*/
+
+std::vector<Cfg> tmr::eval_lock_cond(const Cfg& cfg, const LockIsTakenCondition& cond, const Statement* nY, const Statement* nN, unsigned short tid) {
+    // checks: globalRCULock
+    std::vector<Cfg> result;
+    result.push_back(cfg.copy());
+    bool cres = cfg.globalRCULock;
+    result.back().pc[tid] = cres ? nY : nN;
+    return result;
+}
+
 
 std::vector<Cfg> tmr::eval_rc_sel(const Cfg &cfg, const ReadCriticalSelCondition &cond, const Statement *nY,
                                   const Statement *nN, unsigned short tid) {

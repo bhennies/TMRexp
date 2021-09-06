@@ -42,9 +42,10 @@ static std::unique_ptr<Program> mk_program() {
             SetRC(false)
             );
 
-    auto retire = Sqz(
+    auto retire = Sqz(AtomicSqz(
             AddArg(0),
             // update counter and wait
+            mutex_lock(),
             ToggleGlobalGP(),
             Assign(Var("cur"), Var("RCUrecs")),
             Loop(Sqz(
@@ -54,7 +55,7 @@ static std::unique_ptr<Program> mk_program() {
                                Sqz(
                                        Loop(Sqz(
                                                IfThenElse(GracePeriodCond("cur"),
-                                                          Sqz(AddArg(0)),
+                                                          Sqz(),
                                                           Sqz(
                                                                   Brk()
                                                                   ))
@@ -66,7 +67,7 @@ static std::unique_ptr<Program> mk_program() {
                  )
             ),
             // update counter and wait
-            /*ToggleGlobalGP(),
+            ToggleGlobalGP(),
             Assign(Var("cur"), Var("RCUrecs")),
             Loop(Sqz(
                          IfThenElse(EqCond(Var("cur"), Null()),
@@ -85,11 +86,12 @@ static std::unique_ptr<Program> mk_program() {
                                             Kill("tmp")
                                     ))
                  )
-            ),*/
+            ),
             Kill("cur"),
             Free(0),
-            Clear(0)
-    );
+            Clear(0),
+            mutex_unlock()
+    ));
 
     auto prog = Prog(
             name,
@@ -108,6 +110,6 @@ static std::unique_ptr<Program> mk_program() {
 int main(int argc, char *argv[]) {
     // make program and observer
     std::unique_ptr<Program> program = mk_program();
-    return run_rcu_with_inv(*program);
+    return run_rcu(*program);
 }
 

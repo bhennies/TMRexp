@@ -190,6 +190,10 @@ std::unique_ptr<ReadCriticalSelCondition> tmr::RCCond(std::string name) {
     return std::make_unique<ReadCriticalSelCondition>(Var(name));
 }
 
+std::unique_ptr<LockIsTakenCondition> tmr::LockIsTaken() {
+    return std::make_unique<LockIsTakenCondition>();
+}
+
 
 std::unique_ptr<Assignment> tmr::Assign (std::unique_ptr<Expr> lhs, std::unique_ptr<Expr> rhs) {
 	if (rhs->clazz() == Expr::NIL) throw std::logic_error("Assigning NULL not supported. Use NullAssignment/SetNull instead.");
@@ -284,9 +288,25 @@ std::unique_ptr<StoreGPPhaseToRec> tmr::StoreGlobalGPToRec() {
     return std::make_unique<StoreGPPhaseToRec>();
 }
 
+std::unique_ptr<SetGlobalLock> tmr::SetLock(bool setTo) {
+    return std::make_unique<SetGlobalLock>(setTo);
+}
+
 std::unique_ptr<Function> tmr::Fun(std::string name, std::unique_ptr<Sequence> body, bool has_arg) {
 	std::unique_ptr<Function> res(new Function(name, std::move(body), has_arg));
 	return res;
+}
+
+std::unique_ptr<Sequence> tmr::mutex_lock() {
+    return Sqz(Loop( Sqz(
+            AtomicSqz(IfThenElse(LockIsTaken(), Sqz(), Sqz(
+                    SetLock(true),
+                    Brk()))
+            ))));
+}
+
+std::unique_ptr<Sequence> tmr::mutex_unlock() {
+    return Sqz(SetLock(false));
 }
 
 
@@ -312,8 +332,9 @@ void ReadCriticalVarCondition::propagateFun(const Function *fun) {}
 
 void ReadCriticalSelCondition::propagateFun(const Function *fun) {}
 
-void GracePeriodCondition::propagateFun(const Function *fun) {
-}
+void GracePeriodCondition::propagateFun(const Function *fun) {}
+
+void LockIsTakenCondition::propagateFun(const Function *fun) {}
 
 void Sequence::propagateFun(const Function* fun) {
 	Statement::propagateFun(fun);
@@ -398,6 +419,8 @@ void GracePeriodCondition::namecheck(const std::map<std::string, Variable *> &na
     _cmp->namecheck(name2decl);
 }
 
+void LockIsTakenCondition::namecheck(const std::map<std::string, Variable *> &name2decl) {}
+
 void Sequence::namecheck(const std::map<std::string, Variable*>& name2decl) {
 	for (const auto& stmt : _stmts) stmt->namecheck(name2decl);
 }
@@ -468,6 +491,8 @@ void ToggleGlobalGracePeriod::namecheck(const std::map<std::string, Variable *> 
 
 void StoreGPPhaseToRec::namecheck(const std::map<std::string, Variable *> &name2decl) {
 }
+
+void SetGlobalLock::namecheck(const std::map<std::string, Variable *> &name2decl) {}
 
 void Function::namecheck(const std::map<std::string, Variable*>& name2decl) {
 	_stmts->namecheck(name2decl);
@@ -591,6 +616,8 @@ void ToggleGlobalGracePeriod::checkRecInit(std::set<const Variable *> &fromAlloc
 
 void StoreGPPhaseToRec::checkRecInit(std::set<const Variable *> &fromAllocation) const {
 }
+
+void SetGlobalLock::checkRecInit(std::set<const Variable *> &fromAllocation) const {}
 
 void Function::checkRecInit() const {
 	std::set<const Variable*> fromAllocation;
@@ -798,6 +825,10 @@ void GracePeriodCondition::print(std::ostream &os) const {
     os << *_cmp << "->readCriticalSel && (" << *_cmp << "->gracePeriodPhaseSel != GracePeriodPhase)" << std::endl;
 }
 
+void LockIsTakenCondition::print(std::ostream &os) const {
+    os << "globalRCULock";
+}
+
 std::ostream& tmr::operator<<(std::ostream& os, const Statement& stmt) {
 	stmt.print(os, 0);
 	return os;
@@ -916,7 +947,7 @@ void FreeAll::print(std::ostream& os, std::size_t indent) const {
 
 void SetReadCritical::print(std::ostream &os, std::size_t indent) const {
     printID;
-    os << "__rec__->readCriticalSel = " << _setTo << ";";
+    os << "__rec__->readCriticalSel = " << _setTo << ";" << std::endl;
 }
 
 void ToggleGlobalGracePeriod::print(std::ostream &os, std::size_t indent) const {
@@ -928,6 +959,10 @@ void ToggleGlobalGracePeriod::print(std::ostream &os, std::size_t indent) const 
 void StoreGPPhaseToRec::print(std::ostream &os, std::size_t indent) const {
     printID
     os << "__rec__->gracePeriodPhaseSel = GracePeriodPhase;" << std::endl;
+}
+
+void SetGlobalLock::print(std::ostream &os, std::size_t indent) const {
+    os << "globalRCULock = " << _setTo << ";" << std::endl;
 }
 
 std::ostream& tmr::operator<<(std::ostream& os, const Function& fun) {
@@ -996,6 +1031,7 @@ void Program::print(std::ostream& os) const {
 	os << ";" << std::endl;
 	INDENT(2);
 	os << "bool GracePeriodPhase;" << std::endl;
+    os << "bool globalRCULock;" << std::endl;
 	// local ptr variables
 	std::cout << std::endl;
 	INDENT(1);

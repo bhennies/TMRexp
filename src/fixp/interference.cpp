@@ -55,6 +55,10 @@ static inline bool can_interfere(const Cfg& cfg, const Cfg& interferer) {
 		return false;
 	}
 
+    if(cfg.globalRCULock != interferer.globalRCULock) {
+        return false;
+    }
+
     if (cfg.globalGracePeriodPhase != interferer.globalGracePeriodPhase) {
         return false;
     }
@@ -220,7 +224,7 @@ static inline bool can_skip_interference(const Cfg& victim, const Cfg& interfere
 			if (static_cast<const Ite&>(ipc).cond().type() != Condition::CASC) return true; // only local updates
 			break;
 		case Statement::INITREC:
-        case Statement::SETREADCRITICAL: // Not totally sure about this
+        //case Statement::SETREADCRITICAL: // Not totally sure about this
 			if (!interferer.offender[0]) return true; // has no effect
 			break;
 		case Statement::ASSIGN:
@@ -236,7 +240,7 @@ static inline bool can_skip_interference(const Cfg& victim, const Cfg& interfere
 	// skip victim if its actions cannot be influenced
 	switch (vpc.clazz()) {
 		case Statement::INITREC:
-        case Statement::SETREADCRITICAL: // Not totally sure about this
+        //case Statement::SETREADCRITICAL: // Not totally sure about this
 			if (!victim.offender[0]) return true; // has no effect
 			break;
 		case Statement::SETNULL:
