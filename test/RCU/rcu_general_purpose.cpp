@@ -34,9 +34,11 @@ static std::unique_ptr<Program> mk_program() {
                             );
 
     auto readBegin = Sqz(AtomicSqz(
-                SetRC(true),
-                StoreGlobalGPToRec()
-    ));
+            StoreGlobalGPToRec(),
+                SetRC(true)
+
+    )
+            );
 
     auto readEnd = Sqz(
             SetRC(false)

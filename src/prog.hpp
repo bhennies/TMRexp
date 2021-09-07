@@ -249,7 +249,7 @@ namespace tmr {
 			};
 			virtual ~Statement() = default;
 			virtual Class clazz() const = 0;
-			unsigned short id() const { assert(_id != 0); return _id; }
+			unsigned short id() const { /*assert(_id != 0);*/ return _id; }
 			const Function& function() const { assert(_parent != NULL); return *_parent; }
 			virtual bool is_conditional() const { return false; }
 			virtual const Statement* next() const { return _next; }

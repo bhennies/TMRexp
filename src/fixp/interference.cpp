@@ -80,6 +80,12 @@ static inline bool can_interfere(const Cfg& cfg, const Cfg& interferer) {
 	if (!do_shapes_match(cfg, interferer))
 		return false;
 
+    // Only one thread is allowed to be in mutex-section
+
+    if (cfg.pc[0] && interferer.pc[0] && cfg.pc[0]->id() > 27 && interferer.pc[0]->id() > 27) {
+        return false;
+    }
+
 	return true;
 }
 
